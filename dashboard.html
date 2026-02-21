@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GPMX App Prototype (Complete)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .sidebar-transition { transition: transform 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center min-h-screen font-sans">
+
+    <!-- App 容器 -->
+    <div class="w-full max-w-md bg-gray-50 min-h-screen shadow-2xl relative overflow-hidden flex flex-col">
+
+        <!-- ================= 全局组件: 侧滑隐藏菜单 ================= -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden" onclick="toggleSidebar()"></div>
+        <div id="sidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-white z-50 transform -translate-x-full sidebar-transition flex flex-col shadow-xl">
+            <div class="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white relative">
+                <button onclick="toggleSidebar()" class="absolute top-4 right-4 text-white opacity-80 hover:opacity-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold text-xl mb-2 cursor-pointer" onclick="navigateTo('page-profile')">S</div>
+                <h2 class="font-bold text-lg">Hi, Shun</h2>
+                <p class="text-xs opacity-80">GPMX 创世会员</p>
+            </div>
+            <div class="flex-1 overflow-y-auto py-2 no-scrollbar">
+                <ul class="space-y-1">
+                    <li><button onclick="navigateTo('page-dashboard')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Dashboard (首页)</button></li>
+                    <li><button onclick="navigateTo('page-profile')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Profile (个人资料)</button></li>
+                    <li><button onclick="navigateTo('page-ai-selection')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">AI (高我连结)</button></li>
+                    <li><button onclick="navigateTo('page-meditation')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Meditation guidance</button></li>
+                    <li><button onclick="navigateTo('page-tuning-tools')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Frequency tuning tools</button></li>
+                    <li><button onclick="navigateTo('page-learning-hub')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Learning hub</button></li>
+                    <li><button onclick="navigateTo('page-community-centre')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Community centre</button></li>
+                    <li><button onclick="navigateTo('page-commission-wallet')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Commission wallet</button></li>
+                    <li><button onclick="navigateTo('page-referral-list')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Referee (推荐列表)</button></li>
+                    <li><button onclick="navigateTo('page-quests-centre')" class="w-full text-left px-5 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 font-medium">Quests centre</button></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ================= 页面 1: Dashboard ================= -->
+        <div id="page-dashboard" class="app-page flex flex-col h-full w-full absolute inset-0 z-10 bg-gray-50">
+            <header class="bg-white shadow-sm px-4 py-3 flex justify-between items-center sticky top-0 z-20">
+                <button onclick="toggleSidebar()" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">GPMX</h1>
+                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm text-blue-600 font-bold cursor-pointer border border-blue-200" onclick="navigateTo('page-profile')">S</div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-4 space-y-6 pb-20 no-scrollbar">
+                <!-- 1. Banner -->
+                <div class="w-full h-36 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex flex-col items-center justify-center border border-indigo-50 shadow-sm cursor-pointer" onclick="navigatePlaceholder('Community Centre')">
+                    <span class="text-indigo-800 font-bold text-lg mb-1">GPMX Soft Launch 活动</span>
+                    <span class="text-sm text-indigo-600 bg-white px-3 py-1 rounded-full shadow-sm">点击查看详情</span>
+                </div>
+
+                <!-- 2. Commission Pool HUD -->
+                <div class="bg-gradient-to-r from-gray-900 to-blue-900 rounded-2xl p-5 text-white shadow-md relative overflow-hidden cursor-pointer" onclick="navigatePlaceholder('Commission Wallet')">
+                    <div class="absolute right-0 top-0 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></svg>
+                    </div>
+                    <h3 class="text-sm text-gray-300 mb-1">Commission Pool HUD</h3>
+                    <div class="flex items-baseline mb-2">
+                        <span class="text-xs mr-1">RM</span>
+                        <span class="text-3xl font-bold">1,280.50</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-blue-200 mt-4 border-t border-gray-700 pt-2">
+                        <span>团队人数: 42</span>
+                        <span>查看明细 ></span>
+                    </div>
+                </div>
+
+                <!-- 3. Daily enlightenment quotes -->
+                <div class="bg-white rounded-2xl p-5 text-center shadow-sm border border-gray-100">
+                    <div class="text-gray-300 text-3xl font-serif leading-none h-4">"</div>
+                    <p class="text-gray-700 italic text-sm px-4">觉察你的每一次呼吸，高我便存在于你平静的当下之中。</p>
+                    <div class="text-gray-300 text-3xl font-serif leading-none h-4 text-right">"</div>
+                    <p class="text-xs text-gray-400 mt-2">— Daily Enlightenment</p>
+                </div>
+
+                <!-- 4. Music player -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-sm font-bold text-gray-800">环境音调频 (Music Player)</h3>
+                        <button class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white shadow-md hover:bg-blue-600">
+                            <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+                    <div class="flex space-x-2 overflow-x-auto no-scrollbar pb-1">
+                        <button class="px-4 py-2 bg-blue-50 text-blue-600 text-xs font-medium rounded-full whitespace-nowrap border border-blue-100">白噪音 (White Noise)</button>
+                        <button class="px-4 py-2 bg-gray-50 text-gray-500 text-xs font-medium rounded-full whitespace-nowrap border border-gray-100">雨声 (Rain)</button>
+                        <button class="px-4 py-2 bg-gray-50 text-gray-500 text-xs font-medium rounded-full whitespace-nowrap border border-gray-100">海浪 (Wave)</button>
+                    </div>
+                </div>
+
+                <!-- 5. Shortcut to AI functions -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-gray-800">快捷高我连结 (AI Shortcuts)</h3>
+                        <span class="text-xs text-blue-500 cursor-pointer" onclick="navigateTo('page-ai-selection')">全部 ></span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="navigateTo('page-ai-selection')" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50">
+                            <span class="text-xl">💰</span><span class="text-[10px] text-gray-600">财富</span>
+                        </button>
+                        <button onclick="navigateTo('page-ai-selection')" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50">
+                            <span class="text-xl">❤️</span><span class="text-[10px] text-gray-600">关系</span>
+                        </button>
+                        <button onclick="navigateTo('page-ai-selection')" class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50">
+                            <span class="text-xl">🧘</span><span class="text-[10px] text-gray-600">健康</span>
+                        </button>
+                        <button onclick="navigateTo('page-ai-selection')" class="bg-indigo-50 p-3 rounded-xl shadow-sm border border-indigo-100 flex flex-col items-center justify-center gap-1 hover:bg-indigo-100">
+                            <span class="text-xl">🌌</span><span class="text-[10px] text-indigo-700">空间调频</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6, 7, 8. Quests Section -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 border-b border-gray-50 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-gray-800">任务中心 (Quests)</h3>
+                        <span class="text-xs text-gray-400 cursor-pointer" onclick="navigateTo('page-quests-centre')">进入中心 ></span>
+                    </div>
+                    <!-- Quests Items -->
+                    <div class="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer" onclick="navigatePlaceholder('Quests - Daily')">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-sm font-medium text-gray-800 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> 每日任务 (Daily)</span>
+                            <span class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-500">0/3</span>
+                        </div>
+                        <p class="text-xs text-gray-500 pl-4">完成今日冥想与系统签到</p>
+                    </div>
+                    <div class="p-4 border-b border-gray-50 hover:bg-gray-50 cursor-pointer" onclick="navigatePlaceholder('Quests - Pool')">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-sm font-medium text-gray-800 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span> 悬赏池 (Pool)</span>
+                            <span class="text-xs text-blue-500">New</span>
+                        </div>
+                        <p class="text-xs text-gray-500 pl-4">邀请 1 位新朋友加入体验</p>
+                    </div>
+                    <div class="p-4 hover:bg-gray-50 cursor-pointer" onclick="navigatePlaceholder('Quests - Level')">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-sm font-medium text-gray-800 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span> 进阶任务 (Level)</span>
+                        </div>
+                        <p class="text-xs text-gray-500 pl-4">连续 7 天使用空间调频工具</p>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mt-2 ml-4" style="width: calc(100% - 1rem);"><div class="bg-purple-500 h-1.5 rounded-full" style="width: 45%"></div></div>
+                    </div>
+                </div>
+
+                <!-- 9. GIF file placeholder -->
+                <div class="w-full h-24 bg-gray-200 rounded-2xl flex items-center justify-center text-gray-400 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 opacity-50 animate-pulse"></div>
+                    <span class="relative z-10 text-sm font-medium">✨ [GIF Animation Placeholder] ✨</span>
+                </div>
+            </main>
+        </div>
+
+        <!-- ================= 页面 2: Profile (个人资料) ================= -->
+        <div id="page-profile" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-20 bg-gray-50">
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">个人资料</h1>
+                <button onclick="alert('模拟：打开编辑资料弹窗')" class="text-sm text-blue-600 font-medium p-2 -mr-2">编辑</button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-8 no-scrollbar relative">
+                <div class="bg-white px-6 py-8 flex flex-col items-center border-b border-gray-100">
+                    <div class="relative mb-4">
+                        <div class="w-24 h-24 bg-gradient-to-tr from-blue-100 to-indigo-200 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-3xl font-bold text-indigo-600">S</div>
+                        <div class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Shun</h2><p class="text-sm text-gray-500 mt-1">ID: GPMX-882910</p>
+                    <div class="mt-4 inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-medium border border-indigo-100">活跃创世会员 (至 2025-12-31)</div>
+                </div>
+
+                <div class="px-4 py-5">
+                    <div class="flex items-center justify-between mb-3"><h3 class="text-sm font-bold text-gray-800">分红资产积累</h3></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div onclick="navigateTo('page-bloom-history')" class="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-md relative overflow-hidden cursor-pointer hover:shadow-lg transition"><p class="text-xs text-indigo-100 mb-1">绽放分数</p><div class="flex items-baseline gap-1"><span class="text-3xl font-bold">1,650</span><span class="text-xs text-indigo-200">pts</span></div></div>
+                        <div onclick="navigateTo('page-referral-list-1')" class="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-4 text-white shadow-md relative overflow-hidden cursor-pointer hover:shadow-lg transition"><p class="text-xs text-blue-100 mb-1">直推人数</p><div class="flex items-baseline gap-1"><span class="text-3xl font-bold">12</span><span class="text-xs text-blue-200">人</span></div></div>
+                    </div>
+                </div>
+
+                <div class="bg-white mt-2 py-5 border-y border-gray-100">
+                    <div class="px-4 flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold text-gray-800">成就勋章</h3>
+                        <span class="text-xs text-blue-500 cursor-pointer" onclick="navigateTo('page-achievements')">查看全部 (3/15) ></span>
+                    </div>
+                    <div class="flex space-x-4 overflow-x-auto px-4 pb-2 no-scrollbar" onclick="navigateTo('page-achievements')">
+                        <div class="flex flex-col items-center min-w-[70px]"><div class="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 p-1 shadow-sm mb-2 relative"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl border-2 border-yellow-200">🚀</div></div><span class="text-[10px] font-medium text-gray-700 text-center leading-tight">首发先锋</span></div>
+                        <div class="flex flex-col items-center min-w-[70px]"><div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 p-1 shadow-sm mb-2"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl border-2 border-blue-200">🧘‍♂️</div></div><span class="text-[10px] font-medium text-gray-700 text-center leading-tight">调频达人</span></div>
+                        <div class="flex flex-col items-center min-w-[70px] opacity-40 grayscale"><div class="w-14 h-14 rounded-full bg-gray-300 p-1 shadow-sm mb-2"><div class="w-full h-full bg-gray-100 rounded-full flex items-center justify-center text-2xl">🌟</div></div><span class="text-[10px] font-medium text-gray-500 text-center leading-tight">百人领袖</span></div>
+                    </div>
+                </div>
+                
+                <!-- Settings Menu -->
+                <div class="px-4 py-5 space-y-3">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                        <button class="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50 border-b border-gray-50" onclick="alert('进入修改密码页面')">
+                            <span class="text-sm font-medium text-gray-700">修改密码 (Change Password)</span><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                        <button class="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50 border-b border-gray-50" onclick="alert('进入语言设置页面')">
+                            <span class="text-sm font-medium text-gray-700">语言设置 (Language)</span><span class="text-xs text-gray-400 mr-1 flex items-center">繁体中文 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+                        </button>
+                        <button class="w-full px-4 py-4 flex items-center justify-between hover:bg-gray-50" onclick="alert('进入通知管理页面')">
+                            <span class="text-sm font-medium text-gray-700">推送通知 (Notifications)</span><svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                    <button onclick="navigateTo('page-dashboard')" class="w-full mt-6 py-3 bg-red-50 text-red-600 font-bold rounded-xl border border-red-100 hover:bg-red-100 transition">登出账号 (Log Out)</button>
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 3: 绽放分数明细 (已加入线下活动分数) ================= -->
+        <div id="page-bloom-history" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50">
+            <header class="bg-white px-4 py-3 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="navigateTo('page-profile')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider ml-2">绽放分数明细</h1>
+            </header>
+
+            <div class="bg-gradient-to-b from-purple-600 to-indigo-700 pt-8 pb-10 px-6 text-center text-white relative">
+                <p class="text-indigo-200 text-sm mb-1">累计分数</p>
+                <h2 class="text-5xl font-bold">1,650</h2>
+                <div class="absolute bottom-0 left-0 right-0 h-4 bg-gray-50 rounded-t-2xl"></div>
+            </div>
+
+            <main class="flex-1 overflow-y-auto px-4 py-2 no-scrollbar">
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <h3 class="text-sm font-bold text-gray-800">分数获取记录</h3>
+                    <select class="bg-transparent text-xs text-gray-500 border-none outline-none">
+                        <option>本月</option><option>全部</option>
+                    </select>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- 新增项: 邀请新人参与线下活动 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-orange-100 flex items-center justify-between relative overflow-hidden">
+                        <!-- 高亮背景点缀 -->
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-orange-400"></div>
+                        <div class="flex items-center gap-3 pl-2">
+                            <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 text-lg shadow-inner">🎟️</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">邀请新人参与特定线下沙龙</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">线下签到成功 | 2026-02-19 14:00:00</p>
+                            </div>
+                        </div>
+                        <span class="text-orange-500 font-bold text-lg">+200</span>
+                    </div>
+
+                    <!-- 原有记录项 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-lg">✅</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">完成每日进阶任务</p>
+                                <p class="text-xs text-gray-400 mt-0.5">2026-02-18 08:30:12</p>
+                            </div>
+                        </div>
+                        <span class="text-purple-600 font-bold text-lg">+10</span>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-lg">👥</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">成功邀请新伙伴注册</p>
+                                <p class="text-xs text-gray-400 mt-0.5">2026-02-15 14:22:05</p>
+                            </div>
+                        </div>
+                        <span class="text-purple-600 font-bold text-lg">+100</span>
+                    </div>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-6 pb-6">已经到底啦</p>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 4: 直推伙伴列表 ================= -->
+        <div id="page-referral-list-1" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50">
+            <header class="bg-white px-4 py-3 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="navigateTo('page-profile')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider ml-2">直推伙伴列表</h1>
+            </header>
+
+            <div class="bg-white border-b border-gray-100 p-6 flex flex-col items-center">
+                <p class="text-gray-500 text-sm mb-1">累计直推人数</p>
+                <div class="flex items-baseline gap-1">
+                    <h2 class="text-4xl font-bold text-blue-600">12</h2><span class="text-gray-500 text-sm">人</span>
+                </div>
+                <button onclick="alert('弹出分享页面')" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full font-medium text-sm shadow-md hover:bg-blue-700 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> 邀请新伙伴
+                </button>
+            </div>
+
+            <main class="flex-1 overflow-y-auto p-4 no-scrollbar">
+                <div class="relative mb-5">
+                    <input type="text" placeholder="搜索伙伴昵称..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-lg">L</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 flex items-center gap-2">Li Hua <span class="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] rounded">活跃</span></p>
+                                <p class="text-xs text-gray-400 mt-1">注册时间: 2026-02-15</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 5: 成就大厅 ================= -->
+        <div id="page-achievements" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50">
+            <header class="bg-white px-4 py-3 flex items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="navigateTo('page-profile')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg></button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider ml-2">成就大厅</h1>
+            </header>
+
+            <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-6 text-white flex justify-between items-center shadow-md z-10">
+                <div>
+                    <h2 class="text-xl font-bold mb-1">我的荣誉墙</h2><p class="text-xs text-gray-400">点亮勋章，记录每一次绽放。</p>
+                </div>
+                <div class="text-right">
+                    <div class="text-3xl font-bold text-yellow-400">3<span class="text-sm text-gray-500">/15</span></div><p class="text-[10px] text-gray-400 uppercase tracking-wider">已收集</p>
+                </div>
+            </div>
+
+            <main class="flex-1 overflow-y-auto px-4 py-6 space-y-8 no-scrollbar bg-gray-50">
+                <section>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-blue-500 rounded"></div><h3 class="text-sm font-bold text-gray-800 tracking-wide">日常任务等级类别</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-blue-50 flex items-start gap-4 relative overflow-hidden">
+                            <div class="w-14 h-14 shrink-0 rounded-full bg-gradient-to-br from-blue-300 to-blue-500 p-1 shadow-md"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl border-2 border-blue-100">🎓</div></div>
+                            <div class="flex-1 relative z-10">
+                                <h4 class="text-sm font-bold text-gray-800 flex items-center gap-2">初级探路者 <span class="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">已获得</span></h4>
+                                <p class="text-xs text-gray-500 mt-1 leading-relaxed">累计完成 10 个日常任务。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-yellow-500 rounded"></div><h3 class="text-sm font-bold text-gray-800 tracking-wide">出席活动类别</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-yellow-50 flex items-start gap-4 relative overflow-hidden">
+                            <div class="w-14 h-14 shrink-0 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 p-1 shadow-md"><div class="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl border-2 border-yellow-100">🚀</div></div>
+                            <div class="flex-1 relative z-10">
+                                <h4 class="text-sm font-bold text-gray-800 flex items-center gap-2">首发先锋 <span class="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">已获得</span></h4>
+                                <p class="text-xs text-gray-500 mt-1 leading-relaxed">于 GPMX App Soft Launch 期间注册。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-1 h-4 bg-red-500 rounded"></div><h3 class="text-sm font-bold text-gray-800 tracking-wide">稀有活动类别 (Legendary)</h3>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-xl border border-gray-100 flex items-start gap-4 opacity-60 grayscale">
+                            <div class="w-14 h-14 shrink-0 rounded-full bg-gray-200 p-1 shadow-inner"><div class="w-full h-full bg-gray-100 rounded-full flex items-center justify-center text-2xl text-gray-400">👁️‍🗨️</div></div>
+                            <div class="flex-1">
+                                <h4 class="text-sm font-bold text-gray-600 flex items-center gap-2">高我共振者 <span class="text-[9px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded font-bold">隐藏任务</span></h4>
+                                <p class="text-xs text-gray-500 mt-1 leading-relaxed blur-[2px] select-none">此为隐藏成就，不断与高我连结以探索触发条件。</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+		
+		<!-- ================= 页面 6: AI 高我连结板块 (AI Selection) ================= -->
+        <div id="page-ai-selection" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-20 bg-gray-50">
+            <!-- 头部 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">高我连结</h1>
+                
+                <!-- Sun Token 余额外显 -->
+                <button onclick="navigateTo('page-sun-token')" class="flex items-center gap-1 bg-yellow-50 border border-yellow-200 px-3 py-1.5 rounded-full shadow-sm hover:bg-yellow-100 transition">
+                    <span class="text-base leading-none">☀️</span>
+                    <span class="text-sm font-bold text-yellow-700">128</span>
+                </button>
+            </header>
+
+            <!-- 消耗提示条 -->
+            <div class="bg-blue-50 px-4 py-2 flex items-center justify-center gap-2 border-b border-blue-100">
+                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-xs text-blue-700 font-medium">每次与高我深入对话，将消耗 1 Sun Token</span>
+            </div>
+
+            <main class="flex-1 overflow-y-auto p-4 space-y-6 pb-12 no-scrollbar">
+                
+                <!-- 大众开放板块 (Free / All Users) -->
+                <section>
+                    <h2 class="text-sm font-bold text-gray-500 mb-3 ml-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> 灵性启蒙 (开放)
+                    </h2>
+                    <div class="space-y-3">
+                        <!-- 智慧版块 -->
+                        <div onclick="navigateTo('page-ai-chat')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-3xl">🦉</div>
+                            <div class="flex-1">
+                                <h3 class="text-base font-bold text-gray-800">智慧 (Wisdom)</h3>
+                                <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">寻求人生方向的指引，解锁潜意识中的古老智慧，获得启示。</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                        
+                        <!-- 灵魂版块 -->
+                        <div onclick="navigatePlaceholder('AI 聊天室 - 灵魂')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition">
+                            <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-3xl">🌌</div>
+                            <div class="flex-1">
+                                <h3 class="text-base font-bold text-gray-800">灵魂 (Soul)</h3>
+                                <p class="text-xs text-gray-500 mt-0.5 line-clamp-2">触碰灵魂深处的使命与课题，了解你此生为何而来。</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 基础订阅板块 (Basic Subscriber) -->
+                <section>
+                    <div class="flex justify-between items-end mb-3 ml-1">
+                        <h2 class="text-sm font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> 生命丰盛 (Basic)
+                        </h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- 健康 -->
+                        <div onclick="navigatePlaceholder('AI 聊天室 - 健康')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition relative">
+                            <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                            <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center text-2xl mb-2 mt-1">🧘</div>
+                            <h3 class="text-sm font-bold text-gray-800">健康 (Health)</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">身心能量状态评估与疗愈建议。</p>
+                        </div>
+
+                        <!-- 财富 -->
+                        <div onclick="navigatePlaceholder('AI 聊天室 - 财富')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition relative">
+                            <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                            <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-2xl mb-2 mt-1">💰</div>
+                            <h3 class="text-sm font-bold text-gray-800">财富 (Wealth)</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">打通金钱卡点，提升丰盛频率。</p>
+                        </div>
+
+                        <!-- 气质 -->
+                        <div onclick="navigatePlaceholder('AI 聊天室 - 气质')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition relative">
+                            <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                            <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-2xl mb-2 mt-1">✨</div>
+                            <h3 class="text-sm font-bold text-gray-800">气质 (Aura)</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">重塑个人磁场与外在吸引力。</p>
+                        </div>
+
+                        <!-- 关系 -->
+                        <div onclick="navigatePlaceholder('AI 聊天室 - 关系')" class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition relative">
+                            <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                            <div class="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-2xl mb-2 mt-1">🤝</div>
+                            <h3 class="text-sm font-bold text-gray-800">关系 (Relation)</h3>
+                            <p class="text-[10px] text-gray-500 mt-1">改善伴侣、家庭与职场人际纽带。</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Bloomer 专属板块 -->
+                <section>
+                    <h2 class="text-sm font-bold text-gray-500 mb-3 ml-1 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> 终极场域 (Bloomer)
+                    </h2>
+                    
+                    <div onclick="alert('需要升级为 Bloomer 才能解锁此板块')" class="bg-gradient-to-r from-gray-900 to-indigo-900 rounded-2xl p-5 shadow-lg relative overflow-hidden cursor-pointer group">
+                        <div class="absolute right-0 top-0 w-32 h-32 bg-white opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="w-14 h-14 rounded-full bg-white bg-opacity-10 border border-white border-opacity-20 flex items-center justify-center text-3xl backdrop-blur-sm">🏠</div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-base font-bold text-white">空间调频 (Space)</h3>
+                                    <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <p class="text-xs text-indigo-200 mt-0.5 leading-relaxed">连接你的物理与灵性能量场，清理负面频率，建立高维庇护所。</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-white border-opacity-10 flex justify-between items-center relative z-10">
+                            <span class="text-[10px] text-yellow-400 font-medium uppercase tracking-wider">🔒 仅限 Bloomer 解锁</span>
+                            <span class="text-xs text-white bg-white bg-opacity-20 px-3 py-1 rounded-full group-hover:bg-opacity-30 transition">了解升级特权</span>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- ================= 页面 7: Sun Token 资产明细 ================= -->
+        <div id="page-sun-token" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-100">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex items-center sticky top-0 z-20 shadow-sm">
+                <!-- 返回按钮 -->
+                <button onclick="navigateTo('page-ai-selection')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider ml-2">Sun Token 资产</h1>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-10 no-scrollbar">
+                
+                <!-- 1. 资产总览卡片 (Hero Card) -->
+                <div class="bg-white px-4 py-5 mb-2 shadow-sm">
+                    <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+                        <!-- 装饰背景 -->
+                        <div class="absolute -right-4 -top-4 opacity-20 text-7xl">☀️</div>
+                        <div class="relative z-10">
+                            <p class="text-sm text-yellow-50 mb-1 font-medium tracking-wide">总可用 Sun Token</p>
+                            <div class="flex items-baseline gap-1 mb-4">
+                                <span class="text-4xl font-bold">128</span>
+                                <span class="text-xs text-yellow-100 uppercase tracking-wider">Tokens</span>
+                            </div>
+
+                            <!-- 资产分类明细 -->
+                            <div class="space-y-2 border-t border-yellow-300 border-opacity-50 pt-3">
+                                <!-- 周期赠送 (有期限) -->
+                                <div class="flex justify-between items-center bg-white bg-opacity-20 px-3 py-2 rounded-lg backdrop-blur-sm">
+                                    <div>
+                                        <p class="text-xs font-bold text-white flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                            周期赠送 (将到期)
+                                        </p>
+                                        <p class="text-[10px] text-yellow-100 mt-0.5">28个 将于本月底 23:59 过期</p>
+                                    </div>
+                                    <span class="text-lg font-bold">28</span>
+                                </div>
+                                <!-- 自行充值 (无期限) -->
+                                <div class="flex justify-between items-center bg-white bg-opacity-10 px-3 py-2 rounded-lg">
+                                    <p class="text-xs font-bold text-white flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                        自行充值 (永久有效)
+                                    </p>
+                                    <span class="text-lg font-bold">100</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 优先消耗规则提示 -->
+                    <p class="text-[10px] text-gray-500 mt-3 flex items-start gap-1 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                        <svg class="w-4 h-4 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>系统提示：与高我连结时，系统将优先消耗即将到期的 Sun Token。</span>
+                    </p>
+                </div>
+
+                <!-- 2. 兑换码中心 (Redeem Code) -->
+                <div class="bg-white px-4 py-5 mb-2 shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span> 兑换奖励
+                    </h3>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="输入 Sun Token 兑换码..." class="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <button onclick="alert('兑换成功！获得了 10 Sun Token。')" class="bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-gray-700 transition">
+                            兑换
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. 充值中心 (Top-up Store) -->
+                <div class="bg-white px-4 py-5 mb-2 shadow-sm">
+                    <h3 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-yellow-400 rounded-full"></span> 充值中心 (永久有效)
+                    </h3>
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <!-- Package 1 -->
+                        <div class="border-2 border-orange-400 bg-orange-50 rounded-xl p-3 flex flex-col items-center cursor-pointer relative shadow-sm">
+                            <span class="absolute -top-2 bg-orange-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">推荐</span>
+                            <span class="text-xl mb-1">☀️</span>
+                            <span class="text-sm font-bold text-gray-800">50</span>
+                            <span class="text-[10px] text-gray-500 mt-1">RM 10</span>
+                        </div>
+                        <!-- Package 2 -->
+                        <div class="border border-gray-200 bg-white rounded-xl p-3 flex flex-col items-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition">
+                            <span class="text-xl mb-1">☀️</span>
+                            <span class="text-sm font-bold text-gray-800">200</span>
+                            <span class="text-[10px] text-gray-500 mt-1">RM 38</span>
+                        </div>
+                        <!-- Package 3 -->
+                        <div class="border border-gray-200 bg-white rounded-xl p-3 flex flex-col items-center cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition">
+                            <span class="text-xl mb-1">☀️</span>
+                            <span class="text-sm font-bold text-gray-800">500</span>
+                            <span class="text-[10px] text-gray-500 mt-1">RM 88</span>
+                        </div>
+                    </div>
+                    <!-- 充值跳转按钮 -->
+                    <button onclick="alert('将跳转至 Payment Gateway 结单程序...')" class="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition flex justify-center items-center gap-2">
+                        立即充值 RM 10.00
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+
+                <!-- 4. 历史记录 (History Tracking) -->
+                <div class="bg-white px-4 py-5 shadow-sm min-h-[300px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+                            <span class="w-1.5 h-4 bg-gray-400 rounded-full"></span> 代币流水记录
+                        </h3>
+                        <!-- 月份筛选 -->
+                        <select class="bg-gray-50 border border-gray-200 text-xs text-gray-600 rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-orange-400">
+                            <option>2026年 2月</option>
+                            <option>2026年 1月</option>
+                            <option>2025年 12月</option>
+                        </select>
+                    </div>
+
+                    <!-- 历史流水列表 -->
+                    <div class="space-y-4">
+                        <!-- 消耗记录 -->
+                        <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">高我连结消耗 (财富版块)</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">2026-02-20 14:30:12</p>
+                                </div>
+                            </div>
+                            <span class="text-red-500 font-bold text-base">-1</span>
+                        </div>
+
+                        <!-- 充值记录 -->
+                        <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-50 text-green-500 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">自行充值 (RM 10 套餐)</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">2026-02-18 10:15:00</p>
+                                </div>
+                            </div>
+                            <span class="text-green-500 font-bold text-base">+50</span>
+                        </div>
+
+                        <!-- 周期赠送记录 -->
+                        <div class="flex justify-between items-center border-b border-gray-50 pb-3">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-8 h-8 rounded-full bg-yellow-50 text-yellow-500 flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-800">Subscriber 每月赠送</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">2026-02-01 00:00:00</p>
+                                </div>
+                            </div>
+                            <span class="text-green-500 font-bold text-base">+30</span>
+                        </div>
+                    </div>
+                    <p class="text-center text-xs text-gray-400 mt-6 pb-6">到底啦</p>
+                </div>
+
+            </main>
+        </div>
+		
+		<!-- ================= 页面 8: AI 聊天室 (以"智慧"板块为例) ================= -->
+        <div id="page-ai-chat" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50 overflow-hidden">
+            
+            <!-- 聊天室头部 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center z-20 shadow-sm shrink-0">
+                <div class="flex items-center">
+                    <!-- 返回到 AI 选择页面 -->
+                    <button onclick="navigateTo('page-ai-selection')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <!-- 板块名称与 Icon -->
+                    <div class="ml-2 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-lg">🦉</span>
+                        <div>
+                            <h1 class="text-base font-bold text-gray-800 leading-tight">高我连结 - 智慧</h1>
+                            <p class="text-[10px] text-green-500 font-medium flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> 场域已开启
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧：历史记录按钮 & 当前 Token 余额 -->
+                <div class="flex items-center gap-3">
+                    <div class="text-xs font-bold text-yellow-600 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100 flex items-center gap-1">
+                        ☀️ 128
+                    </div>
+                    <button onclick="toggleChatHistory()" class="text-gray-500 hover:text-blue-600 focus:outline-none relative p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 聊天内容展示区 (默认显示新窗口的引导) -->
+            <main id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar pb-4">
+                
+                <!-- 初始引导状态 (Empty State) -->
+                <div class="flex flex-col items-center justify-center pt-8 pb-4 text-center px-4 animate-fade-in">
+                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center text-4xl mb-4 shadow-inner border-4 border-white">
+                        🦉
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-800 mb-2">欢迎来到智慧场域</h2>
+                    <p class="text-xs text-gray-500 leading-relaxed mb-6">
+                        在这里，高我将协助你拨开迷雾，洞悉生命的底层逻辑。<br>你可以向我倾诉你当前的困惑，我将为你提供更高维度的指引与人生方向。
+                    </p>
+                    
+                    <!-- 推荐提问 (点击即可发送) -->
+                    <div class="w-full space-y-2 text-left">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">推荐连结方向 (点击开启连结)</p>
+                        <button onclick="alert('模拟发送: 我最近对职业发展感到很迷茫，不知道该怎么选。')" class="w-full bg-white border border-blue-100 hover:border-blue-300 hover:bg-blue-50 text-gray-700 text-sm p-3 rounded-xl shadow-sm transition text-left">
+                            "我最近对职业发展感到很迷茫，不知道该怎么选择..."
+                        </button>
+                        <button onclick="alert('模拟发送: 如何找到我人生真正的使命与热情所在？')" class="w-full bg-white border border-blue-100 hover:border-blue-300 hover:bg-blue-50 text-gray-700 text-sm p-3 rounded-xl shadow-sm transition text-left">
+                            "如何找到我人生真正的使命与热情所在？"
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 模拟的对话气泡 (实际开发时由JS动态生成，这里展示样式) -->
+                <!-- <div class="flex justify-end mb-4">
+                    <div class="bg-blue-600 text-white text-sm py-2 px-4 rounded-2xl rounded-tr-sm max-w-[85%] shadow-md">
+                        如何找到我人生真正的使命？
+                    </div>
+                </div>
+                <div class="flex justify-start mb-4 gap-2">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm shrink-0 mt-1">🦉</div>
+                    <div class="bg-white text-gray-800 text-sm py-3 px-4 rounded-2xl rounded-tl-sm max-w-[85%] shadow-sm border border-gray-100 leading-relaxed">
+                        亲爱的，你的使命并不在遥远的未来，而是隐藏在你当下的喜悦之中。回想一下，什么事情能让你忘记时间的流逝？
+                    </div>
+                </div> -->
+            </main>
+
+            <!-- 底部输入框区 -->
+            <footer class="bg-white border-t border-gray-100 p-3 shrink-0 pb-safe">
+                <div class="flex items-end gap-2 bg-gray-50 border border-gray-200 rounded-2xl p-1.5 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-400 transition">
+                    <!-- 文本输入框 (只允许文字，无附件功能) -->
+                    <textarea rows="1" placeholder="向高我提问..." class="flex-1 bg-transparent border-none focus:ring-0 resize-none max-h-24 text-sm px-2 py-2 text-gray-800" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+                    
+                    <!-- 发送按钮 -->
+                    <button class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-md hover:bg-blue-700 active:scale-95 transition mb-0.5">
+                        <svg class="w-5 h-5 transform rotate-90" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>
+                    </button>
+                </div>
+                <!-- 消耗提示 -->
+                <div class="text-center mt-2 mb-1">
+                    <span class="text-[10px] text-gray-400 flex items-center justify-center gap-1">
+                        <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                        每次发送对话将消耗 1 Sun Token
+                    </span>
+                </div>
+            </footer>
+
+            <!-- ================= 右侧弹出的历史记录抽屉 (History Drawer) ================= -->
+            <div id="history-overlay" class="fixed inset-0 bg-black bg-opacity-40 z-40 hidden" onclick="toggleChatHistory()"></div>
+            <div id="history-drawer" class="fixed top-0 right-0 bottom-0 w-72 bg-white z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl rounded-l-2xl">
+                <!-- 抽屉头部 -->
+                <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-tl-2xl">
+                    <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        历史连结 (智慧)
+                    </h3>
+                    <button onclick="toggleChatHistory()" class="text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-200 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                
+                <!-- 新建聊天按钮 -->
+                <div class="p-4 border-b border-gray-100">
+                    <button onclick="toggleChatHistory(); alert('已开启新场域');" class="w-full py-2.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-100 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        开启全新连结
+                    </button>
+                </div>
+
+                <!-- 历史话题列表 -->
+                <div class="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-2 mb-2">最近 7 天</p>
+                    
+                    <!-- 历史话题 1 -->
+                    <div class="p-3 bg-gray-50 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition" onclick="alert('载入历史对话: 关于职业选择的迷茫')">
+                        <h4 class="text-sm font-bold text-gray-800 truncate">关于职业选择的迷茫</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">今天 14:30 · 包含 6 条对话</p>
+                    </div>
+
+                    <!-- 历史话题 2 -->
+                    <div class="p-3 bg-gray-50 rounded-xl border border-transparent hover:border-gray-200 cursor-pointer transition" onclick="alert('载入历史对话: 如何处理与同事的意见分歧')">
+                        <h4 class="text-sm font-bold text-gray-800 truncate">如何处理与同事的意见分歧</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">昨天 09:15 · 包含 4 条对话</p>
+                    </div>
+
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-2 mt-4 mb-2">更早之前</p>
+
+                    <!-- 历史话题 3 -->
+                    <div class="p-3 bg-white border border-gray-100 rounded-xl hover:border-gray-300 cursor-pointer transition" onclick="alert('载入历史对话: 寻找生活的目标感')">
+                        <h4 class="text-sm font-bold text-gray-700 truncate">寻找生活的目标感</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">2026-02-10 · 包含 12 条对话</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+		
+		
+		<!-- ================= 页面 9: 冥想指引 (Meditation Guidance) ================= -->
+        <!-- 注意：这里故意使用了深色渐变背景 (Dark Theme)，营造宁静的冥想氛围 -->
+        <div id="page-meditation" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gradient-to-b from-indigo-950 via-gray-900 to-black overflow-hidden text-white">
+            
+            <!-- 头部导航 (透明) -->
+            <header class="px-4 py-4 flex justify-between items-center z-20 shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-300 hover:text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-base font-bold tracking-widest text-indigo-100">高我冥想室</h1>
+                <div class="w-8"></div> <!-- 占位对齐 -->
+            </header>
+
+            <main class="flex-1 overflow-y-auto px-5 pb-24 no-scrollbar relative z-10">
+                
+                <!-- 引言与动画区 -->
+                <div class="flex flex-col items-center justify-center pt-2 pb-6">
+                    <!-- 模拟呼吸光晕动画 -->
+                    <div class="w-24 h-24 rounded-full bg-indigo-500 bg-opacity-20 flex items-center justify-center mb-6 relative">
+                        <div class="absolute inset-0 rounded-full bg-indigo-400 bg-opacity-30 animate-ping" style="animation-duration: 4s;"></div>
+                        <span class="text-4xl relative z-10">🧘</span>
+                    </div>
+                    <p class="text-sm text-indigo-200 text-center leading-relaxed tracking-wide font-light">
+                        "清空繁杂的思绪，<br>将意识带回当下，聆听内在的声音。"
+                    </p>
+                </div>
+
+                <!-- 1. 时长设置 (Timer) - 所有用户可用 -->
+                <section class="mb-8">
+                    <h2 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        设置时长 (Timer)
+                    </h2>
+                    <div class="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+                        <button class="shrink-0 w-16 py-2.5 rounded-2xl border border-indigo-500 bg-indigo-600 bg-opacity-20 text-white font-bold text-sm transition">5 min</button>
+                        <button class="shrink-0 w-16 py-2.5 rounded-2xl border border-gray-600 text-gray-400 hover:bg-gray-800 font-medium text-sm transition">10 min</button>
+                        <button class="shrink-0 w-16 py-2.5 rounded-2xl border border-gray-600 text-gray-400 hover:bg-gray-800 font-medium text-sm transition">15 min</button>
+                        <button class="shrink-0 w-16 py-2.5 rounded-2xl border border-gray-600 text-gray-400 hover:bg-gray-800 font-medium text-sm transition">30 min</button>
+                        <button class="shrink-0 w-16 py-2.5 rounded-2xl border border-gray-600 text-gray-400 hover:bg-gray-800 font-medium text-sm transition text-2xl leading-none">+</button>
+                    </div>
+                </section>
+
+                <!-- 2. 主引导选择 (Main Guidance) -->
+                <section class="mb-8">
+                    <h2 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest">
+                        主引导演奏 (Guidance)
+                    </h2>
+                    <div class="space-y-3">
+                        <!-- Free: 基础无引导 -->
+                        <div class="bg-gray-800 bg-opacity-50 border border-indigo-500 border-opacity-50 p-3 rounded-2xl flex items-center justify-between cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xl">🤫</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">寂静计时 (仅环境音)</h3>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">Free 基础功能</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-indigo-400 bg-indigo-500 flex items-center justify-center">
+                                <div class="w-2 h-2 rounded-full bg-white"></div> <!-- 选中的样式 -->
+                            </div>
+                        </div>
+
+                        <!-- Basic: 人声引导 -->
+                        <div class="bg-gray-800 bg-opacity-30 border border-gray-700 p-3 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-gray-800 transition relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-blue-500 text-[8px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Basic</div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-900 bg-opacity-50 flex items-center justify-center text-xl">🗣️</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">全身扫描放松引导</h3>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">温和女声 · 缓解焦虑</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-600"></div>
+                        </div>
+
+                        <!-- Basic: 音乐 -->
+                        <div class="bg-gray-800 bg-opacity-30 border border-gray-700 p-3 rounded-2xl flex items-center justify-between cursor-pointer hover:bg-gray-800 transition relative overflow-hidden">
+                            <div class="absolute top-0 right-0 bg-blue-500 text-[8px] font-bold px-2 py-0.5 rounded-bl-lg uppercase">Basic</div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-purple-900 bg-opacity-50 flex items-center justify-center text-xl">🎵</div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-white">高频宇宙能量共振</h3>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">432Hz 疗愈音乐</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-600"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. 特殊音效叠加 (Bloomer 专属混音器) -->
+                <section>
+                    <div class="flex justify-between items-end mb-3">
+                        <h2 class="text-xs font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-1">
+                            <span>✨</span> 疗愈音效叠加 (Add-on)
+                        </h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-3">
+                        <!-- 颂钵 (Bloomer) -->
+                        <div onclick="alert('升级 Bloomer 以解锁特殊疗愈音效！')" class="bg-gray-800 bg-opacity-40 border border-gray-700 rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer relative group">
+                            <!-- 锁头 -->
+                            <div class="absolute -top-2 -right-2 w-5 h-5 bg-gray-700 rounded-full border-2 border-gray-900 flex items-center justify-center z-10">
+                                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <div class="text-2xl mb-1 opacity-50">🥣</div>
+                            <h3 class="text-xs font-bold text-gray-300">尼泊尔颂钵</h3>
+                            <p class="text-[9px] text-yellow-600 mt-1 uppercase font-bold">Bloomer</p>
+                        </div>
+
+                        <!-- 木鱼 (Bloomer) -->
+                        <div onclick="alert('升级 Bloomer 以解锁特殊疗愈音效！')" class="bg-gray-800 bg-opacity-40 border border-gray-700 rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer relative group">
+                            <div class="absolute -top-2 -right-2 w-5 h-5 bg-gray-700 rounded-full border-2 border-gray-900 flex items-center justify-center z-10">
+                                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <div class="text-2xl mb-1 opacity-50">🪵</div>
+                            <h3 class="text-xs font-bold text-gray-300">沉心木鱼</h3>
+                            <p class="text-[9px] text-yellow-600 mt-1 uppercase font-bold">Bloomer</p>
+                        </div>
+
+                        <!-- 水滴声 (Bloomer) -->
+                        <div onclick="alert('升级 Bloomer 以解锁特殊疗愈音效！')" class="bg-gray-800 bg-opacity-40 border border-gray-700 rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer relative group">
+                            <div class="absolute -top-2 -right-2 w-5 h-5 bg-gray-700 rounded-full border-2 border-gray-900 flex items-center justify-center z-10">
+                                <svg class="w-3 h-3 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                            </div>
+                            <div class="text-2xl mb-1 opacity-50">💧</div>
+                            <h3 class="text-xs font-bold text-gray-300">空谷水滴</h3>
+                            <p class="text-[9px] text-yellow-600 mt-1 uppercase font-bold">Bloomer</p>
+                        </div>
+                    </div>
+                </section>
+                
+            </main>
+
+            <!-- 底部开始按钮区 -->
+            <footer class="absolute bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-gray-900 to-transparent z-20 pb-safe">
+                <button onclick="alert('开始冥想计时。系统将在结束后发放绽放分数。')" class="w-full py-4 bg-indigo-500 text-white text-lg font-bold rounded-2xl shadow-lg hover:bg-indigo-400 transform hover:-translate-y-1 transition flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                    开始冥想 (5 分钟)
+                </button>
+            </footer>
+        </div>
+
+		<!-- ================= 页面 10: 调频工具 (Frequency Tuning Tools) ================= -->
+        <div id="page-tuning-tools" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-teal-50 overflow-hidden">
+            
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-teal-800 tracking-wider">调频小工具</h1>
+                <div class="w-8"></div> <!-- 占位对齐 -->
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar">
+                
+                <!-- Hero Section: 治愈系插画/欢迎语 -->
+                <div class="bg-gradient-to-br from-teal-400 to-emerald-500 p-6 text-white text-center shadow-md relative overflow-hidden">
+                    <!-- 背景装饰波纹 -->
+                    <div class="absolute inset-0 opacity-20">
+                        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M0,50 C30,80 70,20 100,50 L100,100 L0,100 Z" fill="currentColor"></path>
+                        </svg>
+                    </div>
+                    <div class="relative z-10">
+                        <h2 class="text-2xl font-bold mb-2">回到当下</h2>
+                        <p class="text-sm text-teal-50 opacity-90">只需要 3 分钟，释放压力，重新校准你的频率。</p>
+                    </div>
+                </div>
+
+                <div class="p-4 space-y-6">
+
+                    <!-- Free 类别：快速解压与生理调节 -->
+                    <section>
+                        <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> 快速放松 (Free)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div onclick="alert('进入游戏: 解压捏泡泡')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition">
+                                <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl mb-2">🎈</div>
+                                <h4 class="text-sm font-bold text-gray-800">解压泡泡纸</h4>
+                                <p class="text-[10px] text-gray-500 mt-1">点击捏爆，释放指尖压力</p>
+                            </div>
+                            <div onclick="alert('进入工具: 视觉呼吸')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center cursor-pointer hover:shadow-md transition">
+                                <div class="w-12 h-12 rounded-full bg-teal-50 flex items-center justify-center text-2xl mb-2">🌬️</div>
+                                <h4 class="text-sm font-bold text-gray-800">4-7-8 呼吸法</h4>
+                                <p class="text-[10px] text-gray-500 mt-1">光球指引，平复心率与焦虑</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Basic 类别：深度专注与疗愈 -->
+                    <section>
+                        <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> 正念与心流 (Basic)
+                        </h3>
+                        <div class="space-y-3">
+                            <div onclick="alert('进入互动: 掌心颂钵')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition relative">
+                                <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                                <div class="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-3xl">🥣</div>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-800">掌心颂钵疗愈</h4>
+                                    <p class="text-xs text-gray-500 mt-1">滑动屏幕边缘，感受声音涟漪与共振</p>
+                                </div>
+                            </div>
+                            <div onclick="alert('进入游戏: 曼陀罗填色')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition relative">
+                                <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                                <div class="w-14 h-14 rounded-full bg-pink-50 flex items-center justify-center text-3xl">🎨</div>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-800">曼陀罗绘色</h4>
+                                    <p class="text-xs text-gray-500 mt-1">对称填色，极易进入专注的“心流”状态</p>
+                                </div>
+                            </div>
+                            <div onclick="alert('进入互动: 擦拭心尘')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4 cursor-pointer hover:shadow-md transition relative">
+                                <span class="absolute top-2 right-2 text-[8px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold uppercase">Basic</span>
+                                <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center text-3xl">🧽</div>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-800">擦拭心尘</h4>
+                                    <p class="text-xs text-gray-500 mt-1">抹去屏幕雾气，浮现专属高我肯定语</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Bloomer 专属：高频能量场 -->
+                    <section>
+                        <h3 class="text-xs font-bold text-gray-400 mb-3 uppercase tracking-widest flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> 终极调频 (Bloomer)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div onclick="alert('需升级为 Bloomer 解锁')" class="bg-gradient-to-br from-indigo-900 to-purple-900 p-4 rounded-2xl shadow-md border border-indigo-800 flex flex-col items-center text-center cursor-pointer relative group">
+                                <div class="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 rounded-full border-2 border-gray-900 flex items-center justify-center z-10 shadow-lg">
+                                    <svg class="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-white bg-opacity-10 flex items-center justify-center text-2xl mb-2 backdrop-blur-sm">🌌</div>
+                                <h4 class="text-sm font-bold text-white">潜意识梦境</h4>
+                                <p class="text-[10px] text-indigo-200 mt-1 leading-tight">睡前互动环境音，双脑同步波助眠</p>
+                            </div>
+                            <div onclick="alert('需升级为 Bloomer 解锁')" class="bg-gradient-to-br from-gray-800 to-gray-900 p-4 rounded-2xl shadow-md border border-gray-700 flex flex-col items-center text-center cursor-pointer relative group">
+                                <div class="absolute -top-2 -right-2 w-6 h-6 bg-gray-800 rounded-full border-2 border-gray-900 flex items-center justify-center z-10 shadow-lg">
+                                    <svg class="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                </div>
+                                <div class="w-12 h-12 rounded-full bg-white bg-opacity-10 flex items-center justify-center text-2xl mb-2 backdrop-blur-sm">🧲</div>
+                                <h4 class="text-sm font-bold text-white">同频共振仪</h4>
+                                <p class="text-[10px] text-gray-300 mt-1 leading-tight">调节双摆至完全同步，显化同频能量</p>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+			</div>
+			
+		
+		
+		<!-- ================= 页面 11: 学习中心 (Learning Hub) ================= -->
+        <div id="page-learning-hub" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50 overflow-hidden">
+            
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">学习中心</h1>
+                <button class="text-gray-500 p-1 hover:text-blue-600 focus:outline-none">
+                    <!-- 搜索图标 -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar">
+                
+                <!-- 学习进度追踪仪 (Progress Widget) -->
+                <div class="bg-white p-4 border-b border-gray-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-bold text-gray-800">我的学习足迹</h2>
+                        <span class="text-[10px] text-purple-600 bg-purple-50 px-2 py-0.5 rounded font-bold">本周 +45 绽放分数</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div class="bg-gradient-to-r from-purple-400 to-blue-500 h-full rounded-full" style="width: 60%"></div>
+                        </div>
+                        <span class="text-xs text-gray-500 font-medium">120 / 200 分钟</span>
+                    </div>
+                </div>
+
+                <!-- 分类标签 (Category Tabs) -->
+                <div class="px-4 py-3 bg-gray-50 sticky top-0 z-10 flex gap-2 overflow-x-auto no-scrollbar">
+                    <button class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full shrink-0 shadow-sm">继续学习</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">单集视频 (Video)</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">系列课程 (Course)</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">图文教案 (PDF/PPT)</button>
+                </div>
+
+                <div class="p-4 space-y-4">
+                    
+                    <!-- 1. 正在学习 (Course 格式 - 有进度条) -->
+                    <!-- ⭐ 已修改：点击跳转到 Course 页面 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition" onclick="navigateTo('page-learning-course')">
+                        <div class="h-32 bg-gray-200 relative">
+                            <!-- 封面图占位 -->
+                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 opacity-80"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white font-bold text-xl tracking-widest opacity-50">7天深度疗愈营</span>
+                            </div>
+                            <!-- 课程徽章 -->
+                            <div class="absolute top-2 left-2 bg-black bg-opacity-50 backdrop-blur-md text-white text-[9px] px-2 py-1 rounded flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                系列课程 (Course)
+                            </div>
+                            <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wider">
+                                Bloomer
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-sm font-bold text-gray-800 mb-1">21天潜意识重塑与能量清理</h3>
+                            <p class="text-xs text-gray-500 mb-3">跟随导师引导，每日一集，重塑你的内在财富磁场。</p>
+                            
+                            <!-- 进度条 -->
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold text-blue-600">已学习 3/21 集</span>
+                                <span class="text-[10px] text-gray-400">14%</span>
+                            </div>
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+                                <div class="bg-blue-600 h-1.5 rounded-full" style="width: 14%"></div>
+                            </div>
+
+                            <!-- 奖励标签 -->
+                            <div class="flex items-center gap-1 text-[10px] text-purple-600 bg-purple-50 px-2 py-1.5 rounded-lg border border-purple-100">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                完成本课可获 "疗愈行者" 勋章及 +200 分
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 单集视频 (Video 格式 - Free) -->
+                    <!-- ⭐ 已修改：点击跳转到 Video 页面 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex p-3 gap-3 cursor-pointer hover:bg-gray-50 transition" onclick="navigateTo('page-learning-video')">
+                        <div class="w-28 h-20 bg-blue-100 rounded-xl relative shrink-0 overflow-hidden flex items-center justify-center">
+                            <div class="absolute inset-0 bg-blue-500 opacity-20"></div>
+                            <!-- 播放Icon -->
+                            <div class="w-8 h-8 bg-white bg-opacity-80 rounded-full flex items-center justify-center pl-1 backdrop-blur-sm z-10 text-blue-600 shadow-sm">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                            </div>
+                            <span class="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-[8px] px-1.5 py-0.5 rounded">15:20</span>
+                        </div>
+                        <div class="flex-1 py-1 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="text-sm font-bold text-gray-800 leading-tight">如何正确向高我提问？(基础向)</h3>
+                                </div>
+                                <p class="text-[10px] text-gray-500">掌握与潜意识沟通的 3 个核心技巧。</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="bg-green-100 text-green-700 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Free</span>
+                                <span class="text-[10px] text-purple-600 font-medium">+10 分</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 图文教材 (PDF/PPT 格式 - Basic) -->
+                    <!-- ⭐ 已修改：点击跳转到 PDF 页面 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 flex p-3 gap-3 cursor-pointer hover:bg-gray-50 transition" onclick="navigateTo('page-learning-pdf')">
+                        <div class="w-28 h-20 bg-orange-50 rounded-xl relative shrink-0 overflow-hidden flex items-center justify-center">
+                            <span class="text-3xl opacity-50">📄</span>
+                            <span class="absolute bottom-1 right-1 bg-black bg-opacity-60 text-white text-[8px] px-1.5 py-0.5 rounded">24 页</span>
+                        </div>
+                        <div class="flex-1 py-1 flex flex-col justify-between">
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">显化法则核心思维导图</h3>
+                                <p class="text-[10px] text-gray-500">浓缩版知识点，适合快速复习与记忆。</p>
+                            </div>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="bg-blue-100 text-blue-700 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">Basic</span>
+                                <span class="text-[10px] text-purple-600 font-medium">+15 分</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. 单次付费购买的高级大师课 (Premium/Pay-per-course) -->
+                    <div class="bg-white rounded-2xl shadow-md border border-yellow-200 overflow-hidden relative cursor-pointer group" onclick="alert('跳转至课程详情与购买页面')">
+                        <!-- 锁头遮罩 (暗示需要购买) -->
+                        <div class="absolute inset-0 bg-white bg-opacity-40 backdrop-blur-[1px] z-10 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div class="bg-gray-900 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                点击解锁课程
+                            </div>
+                        </div>
+
+                        <div class="h-28 bg-gradient-to-r from-yellow-600 to-red-600 relative p-4 flex flex-col justify-end">
+                            <!-- 皇冠Icon -->
+                            <div class="absolute top-3 right-3 w-8 h-8 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                <span class="text-lg">👑</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white shadow-sm">财富能量跃迁大师班</h3>
+                            <p class="text-[10px] text-yellow-100 mt-1">GPMX 官方特邀导师授课 · 包含 10 集深度视频</p>
+                        </div>
+                        <div class="p-4 flex justify-between items-center bg-yellow-50">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-gray-900 text-yellow-400 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Premium</span>
+                                <span class="text-xs text-gray-600 font-bold">💎 RM 199.00</span>
+                            </div>
+                            <span class="text-xs text-blue-600 font-bold">查看详情 ></span>
+                        </div>
+                    </div>
+
+                    <div class="h-6"></div> <!-- 底部留白 -->
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 12: 系列课程播放页 (Course) ================= -->
+        <div id="page-learning-course" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-gray-50 overflow-hidden">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-learning-hub')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-sm font-bold text-gray-800 tracking-wider truncate px-4">21天潜意识重塑与能量清理</h1>
+                <div class="w-8"></div> <!-- 占位对齐 -->
+            </header>
+
+            <!-- 视频播放器区域 (模拟) -->
+            <div class="w-full aspect-video bg-black relative flex items-center justify-center shrink-0">
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 z-10"></div>
+                <!-- 播放按钮 -->
+                <button class="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center pl-1.5 backdrop-blur-sm z-20 text-white shadow-lg border border-white border-opacity-30 hover:bg-opacity-30 transition">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                </button>
+                <!-- 视频标题/进度 (底部浮层) -->
+                <div class="absolute bottom-2 left-3 right-3 z-20 flex justify-between items-end">
+                    <div>
+                        <p class="text-[10px] text-blue-300 font-bold mb-0.5">正在播放: 第 3 集</p>
+                        <h2 class="text-sm font-bold text-white shadow-sm">识别你的潜意识限制性信念</h2>
+                    </div>
+                    <span class="text-[10px] text-white bg-black bg-opacity-50 px-1.5 py-0.5 rounded">12:45 / 20:00</span>
+                </div>
+            </div>
+
+            <main class="flex-1 overflow-y-auto bg-gray-50 no-scrollbar">
+                <!-- 课程信息与进度区 -->
+                <div class="bg-white p-4 border-b border-gray-100 shadow-sm mb-2">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-gray-800">课程目录</h3>
+                            <p class="text-xs text-gray-500 mt-1">跟着导师的步伐，完成每日打卡。</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-blue-600 bg-blue-50 px-2 py-1 rounded font-bold">进度: 3/21</span>
+                        </div>
+                    </div>
+                    <!-- 总进度条 -->
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                        <div class="bg-blue-600 h-1.5 rounded-full" style="width: 14%"></div>
+                    </div>
+                </div>
+
+                <!-- 选集列表 (Episodes List) -->
+                <div class="bg-white">
+                    <!-- 集数 1 (已完成) -->
+                    <div class="flex items-center gap-3 p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition">
+                        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-500 line-through">第 1 集：什么是潜意识？</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">已观看 100%</p>
+                        </div>
+                    </div>
+
+                    <!-- 集数 2 (已完成) -->
+                    <div class="flex items-center gap-3 p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition">
+                        <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-500 line-through">第 2 集：情绪的能量层级图</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">已观看 100%</p>
+                        </div>
+                    </div>
+
+                    <!-- 集数 3 (正在播放 / 高亮) -->
+                    <div class="flex items-center gap-3 p-4 border-l-4 border-blue-500 bg-blue-50 cursor-pointer relative">
+                        <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-sm pl-0.5">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold text-blue-800">第 3 集：识别限制性信念</h4>
+                            <div class="flex items-center gap-2 mt-1">
+                                <div class="flex-1 bg-white rounded-full h-1 overflow-hidden">
+                                    <div class="bg-blue-400 h-1 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <p class="text-[10px] text-blue-600 font-bold">观看中</p>
+                            </div>
+                        </div>
+                        <!-- 右侧动画声波 (表示正在播) -->
+                        <div class="flex items-end gap-0.5 h-4 opacity-70">
+                            <div class="w-1 bg-blue-500 h-2 animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-1 bg-blue-500 h-4 animate-bounce" style="animation-delay: 0.2s"></div>
+                            <div class="w-1 bg-blue-500 h-3 animate-bounce" style="animation-delay: 0.3s"></div>
+                        </div>
+                    </div>
+
+                    <!-- 集数 4 (未观看) -->
+                    <div class="flex items-center gap-3 p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition">
+                        <div class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 font-bold text-xs">4</div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-800">第 4 集：切断能量索的实操方法</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">18:30</p>
+                        </div>
+                    </div>
+
+                    <!-- 集数 5 (未观看) -->
+                    <div class="flex items-center gap-3 p-4 border-b border-gray-50 cursor-pointer hover:bg-gray-50 transition">
+                        <div class="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 font-bold text-xs">5</div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-medium text-gray-800">第 5 集：与内在小孩对话</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">22:15</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 13: 单集视频播放页 (Video) ================= -->
+        <div id="page-learning-video" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-gray-50 overflow-hidden">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-learning-hub')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <div class="flex gap-2">
+                    <button class="text-gray-400 hover:text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path></svg></button>
+                    <button class="text-gray-400 hover:text-blue-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg></button>
+                </div>
+            </header>
+
+            <!-- 视频播放器区域 -->
+            <div class="w-full aspect-video bg-gray-900 relative flex items-center justify-center shrink-0">
+                <button class="w-14 h-14 bg-blue-600 bg-opacity-90 rounded-full flex items-center justify-center pl-1.5 shadow-lg border border-white border-opacity-20 hover:scale-105 transition transform">
+                    <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6z"></path></svg>
+                </button>
+            </div>
+
+            <main class="flex-1 overflow-y-auto bg-white no-scrollbar pb-24">
+                <!-- 视频详情信息 -->
+                <div class="p-5 border-b border-gray-100">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Free</span>
+                        <span class="text-[10px] text-gray-500">1.2w 次观看</span>
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-800 mb-2 leading-tight">如何正确向高我提问？(基础向)</h2>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        很多初学者在连接高我时，常常因为提问的方式不对而得不到清晰的指引。本节课将教你掌握与潜意识沟通的 3 个核心技巧。
+                    </p>
+                </div>
+
+                <!-- 讲师信息 -->
+                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 font-bold flex items-center justify-center text-lg">M</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-gray-800">Master Lin</h4>
+                            <p class="text-[10px] text-gray-400">GPMX 官方特约能量导师</p>
+                        </div>
+                    </div>
+                    <button class="px-3 py-1.5 border border-blue-600 text-blue-600 text-xs font-bold rounded-full hover:bg-blue-50 transition">关注</button>
+                </div>
+            </main>
+
+            <!-- 底部：完成学习按钮 (固定吸底) -->
+            <footer class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20 pb-safe">
+                <button onclick="alert('恭喜！完成学习，获得 +10 绽放分数。')" class="w-full py-3.5 bg-blue-600 text-white text-base font-bold rounded-xl shadow-md hover:bg-blue-700 transform transition active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    完成学习 (+10 分)
+                </button>
+            </footer>
+        </div>
+
+
+        <!-- ================= 页面 14: 图文阅读器页 (PDF/PPT) ================= -->
+        <div id="page-learning-pdf" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-gray-900 overflow-hidden">
+            <!-- 头部导航 (暗黑模式适用阅读) -->
+            <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex justify-between items-center shrink-0 z-20">
+                <button onclick="navigateTo('page-learning-hub')" class="p-2 -ml-2 text-gray-300 hover:text-white focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-sm font-bold text-gray-200 tracking-wider truncate px-4">显化法则核心思维导图</h1>
+                <button onclick="alert('全屏模式')" class="text-gray-400 hover:text-white focus:outline-none p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                </button>
+            </header>
+
+            <!-- 模拟的 PDF/PPT 显示区 -->
+            <main class="flex-1 flex flex-col items-center justify-center p-4 relative overflow-hidden bg-gray-800">
+                <!-- 文档页面占位符 -->
+                <div class="w-full max-w-sm aspect-[3/4] bg-white rounded-lg shadow-2xl relative flex flex-col p-6 overflow-hidden">
+                    <div class="text-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 mt-4 mb-2">显化法则 101</h2>
+                        <div class="w-16 h-1 bg-orange-400 mx-auto"></div>
+                    </div>
+                    <div class="flex-1 space-y-4">
+                        <div class="h-4 bg-gray-200 rounded w-full"></div>
+                        <div class="h-4 bg-gray-200 rounded w-5/6"></div>
+                        <div class="h-4 bg-gray-200 rounded w-4/6"></div>
+                        <div class="h-24 bg-gray-100 rounded mt-6 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 text-sm">图表占位区</div>
+                    </div>
+                    <div class="absolute bottom-4 right-6 text-xs text-gray-400">Page 1</div>
+                </div>
+            </main>
+
+            <!-- 底部翻页控制栏 -->
+            <footer class="bg-gray-900 border-t border-gray-800 p-4 shrink-0 pb-safe z-20">
+                <div class="flex items-center justify-between mb-4">
+                    <!-- 上一页 -->
+                    <button class="p-2 text-gray-400 hover:text-white disabled:opacity-50">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <!-- 页码指示 -->
+                    <div class="text-sm text-gray-300 font-medium bg-gray-800 px-4 py-1.5 rounded-full">
+                        1 / 24
+                    </div>
+                    <!-- 下一页 -->
+                    <button class="p-2 text-white hover:text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+                
+                <!-- 完成阅读获取分数 -->
+                <button onclick="alert('恭喜你读完了！获得 +15 绽放分数。')" class="w-full py-3 border border-gray-600 text-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600 font-bold rounded-xl transition duration-300 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    完成阅读 (+15 分)
+                </button>
+            </footer>
+        </div>
+		
+		
+		<!-- ================= 页面 15: 社区中心 (Community Centre) ================= -->
+        <div id="page-community-centre" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50 overflow-hidden">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">社区中心</h1>
+                <div class="w-8"></div> <!-- 占位 -->
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar">
+                <!-- 顶部分类 Tab -->
+                <div class="px-4 py-3 bg-white sticky top-0 z-10 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100">
+                    <button class="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-full shrink-0 shadow-sm">推荐活动</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">线上分享 (Online)</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">线下活动 (Offline)</button>
+                    <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">进阶之旅 (Retreats)</button>
+                </div>
+
+                <div class="p-4 space-y-5">
+                    <!-- 活动卡片 1: 线下沙龙 (带积分奖励) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group" onclick="navigateTo('page-event-details')">
+                        <div class="h-36 bg-gray-200 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-br from-indigo-500 to-blue-600 group-hover:scale-105 transition-transform duration-500"></div>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <span class="text-white font-bold text-xl tracking-widest opacity-80">GPMX 线下觉醒沙龙</span>
+                            </div>
+                            <!-- 标签 -->
+                            <div class="absolute top-2 left-2 bg-white text-blue-600 text-[10px] font-bold px-2 py-1 rounded shadow-sm">📍 线下活动</div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-base font-bold text-gray-800 mb-1">GPMX 城市聚点：能量链接沙龙</h3>
+                            <p class="text-xs text-gray-500 mb-3 flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> 2026年3月15日 14:00 | 吉隆坡</p>
+                            
+                            <div class="flex items-center justify-between mt-2 pt-3 border-t border-gray-50">
+                                <!-- 积分奖励诱饵 -->
+                                <div class="flex items-center gap-1 text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    参与可领 +200 绽放分数
+                                </div>
+                                <span class="text-xs font-bold text-blue-600">开放报名中 &rarr;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动卡片 2: 线上 Zoom -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition">
+                        <div class="p-4 flex gap-4">
+                            <div class="w-24 h-24 bg-gradient-to-br from-teal-400 to-teal-600 rounded-xl shrink-0 flex flex-col items-center justify-center text-white">
+                                <span class="text-2xl">💻</span>
+                                <span class="text-[9px] mt-1 opacity-80">Zoom Live</span>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-between py-1">
+                                <div>
+                                    <h3 class="text-sm font-bold text-gray-800 leading-tight mb-1">GPMX 创世分享会：潜意识的力量</h3>
+                                    <p class="text-[10px] text-gray-500">2026年3月20日 20:30 (GMT+8)</p>
+                                </div>
+                                <div class="flex items-center gap-1 text-[10px] text-purple-600 font-medium">
+                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                    +50 绽放分数
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动卡片 3: 付费 Retreat (高阶旅程) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition group">
+                        <div class="h-36 bg-gray-200 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-800 to-transparent z-10 opacity-90"></div>
+                            <!-- 占位背景图 -->
+                            <div class="absolute inset-0 bg-orange-100 flex items-center justify-center">
+                                <span class="text-4xl">🌴</span>
+                            </div>
+                            <div class="absolute top-2 left-2 z-20 bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-1 rounded shadow-sm">👑 进阶之旅 (Paid)</div>
+                            <div class="absolute bottom-3 left-4 right-4 z-20">
+                                <h3 class="text-base font-bold text-white mb-0.5 shadow-sm">巴厘岛 3天2夜能量净化之旅</h3>
+                                <p class="text-[10px] text-gray-300">2026年5月1日 - 5月3日</p>
+                            </div>
+                        </div>
+                        <div class="p-4 flex items-center justify-between bg-gray-50">
+                            <span class="text-[10px] font-bold text-gray-500 border border-gray-300 px-2 py-1 rounded">仅限 20 个名额</span>
+                            <span class="text-sm font-bold text-gray-800">RM 3,999.00</span>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 页面 16: 活动详情与签到 (Event Details & Check-in) ================= -->
+        <div id="page-event-details" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-white overflow-hidden">
+            <!-- 沉浸式透明头部导航 -->
+            <header class="absolute top-0 w-full px-4 py-3 flex justify-between items-center z-20">
+                <button onclick="navigateTo('page-community-centre')" class="w-8 h-8 bg-black bg-opacity-30 rounded-full flex items-center justify-center pl-1 text-white backdrop-blur-sm">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-24 no-scrollbar">
+                <!-- 活动大图 -->
+                <div class="w-full h-64 bg-gradient-to-br from-indigo-500 to-blue-600 relative flex items-center justify-center">
+                    <h2 class="text-3xl font-bold text-white tracking-widest opacity-80 shadow-sm">线下沙龙</h2>
+                </div>
+
+                <!-- 核心信息区 -->
+                <div class="px-5 py-6 bg-white relative -mt-4 rounded-t-2xl z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-2 inline-block">线下活动</span>
+                            <h1 class="text-xl font-bold text-gray-800 leading-tight">GPMX 城市聚点：能量链接沙龙</h1>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-6 border-b border-gray-100 pb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">2026年3月15日 (周日)</p>
+                                <p class="text-xs text-gray-500">14:00 - 17:00 (GMT+8)</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">吉隆坡中心会场</p>
+                                <p class="text-xs text-gray-500">Lot 10, Bukit Bintang</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 活动介绍 -->
+                    <h3 class="text-sm font-bold text-gray-800 mb-2">活动介绍</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed mb-6">
+                        这是 GPMX 首次举办的线下同频聚会。在这里，我们将共同探讨如何运用潜意识的力量显化财富与健康。导师将在现场带领大家进行深度能量清理冥想。
+                    </p>
+
+                    <!-- 分数奖励说明 -->
+                    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-100 rounded-xl p-4 flex items-start gap-3">
+                        <div class="text-2xl pt-1">🎁</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-orange-800">出席奖励</h4>
+                            <p class="text-xs text-orange-600 mt-1 leading-relaxed">
+                                成功抵达现场并使用 App 扫码签到，即可获得 <strong class="text-orange-700">+200 绽放分数</strong> 以及一枚 <strong class="text-orange-700">"线下先行者" 限定勋章</strong>。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 底部悬浮操作栏 (扫码签到) -->
+            <footer class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] z-20 pb-safe">
+                <button onclick="openQRScanner()" class="w-full py-3.5 bg-gray-900 text-white text-base font-bold rounded-xl shadow-lg hover:bg-black transform transition active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                    扫码签到领积分
+                </button>
+            </footer>
+        </div>
+
+
+        <!-- ================= 全局弹窗: QR 扫码模拟器 (QR Scanner Modal) ================= -->
+        <div id="qr-modal" class="fixed inset-0 bg-black z-[60] hidden flex-col items-center justify-center">
+            <!-- 关闭按钮 -->
+            <button onclick="closeQRScanner()" class="absolute top-6 left-6 text-white bg-black bg-opacity-50 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-xl font-bold text-white tracking-widest mb-2">扫描现场二维码</h2>
+                <p class="text-xs text-gray-400">将现场大屏幕的 QR Code 放入框内即可签到</p>
+            </div>
+
+            <!-- 扫描框 UI -->
+            <div class="relative w-64 h-64 border-2 border-white rounded-2xl overflow-hidden shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] z-10">
+                <!-- 四个角的亮色定位框 -->
+                <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-green-400 rounded-tl-2xl"></div>
+                <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-green-400 rounded-tr-2xl"></div>
+                <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-green-400 rounded-bl-2xl"></div>
+                <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-green-400 rounded-br-2xl"></div>
+                
+                <!-- 上下移动的扫描线 -->
+                <div class="absolute w-full h-0.5 bg-green-400 shadow-[0_0_15px_#4ade80] animate-scan z-20"></div>
+                
+                <!-- 相机视图模拟 (透明占位) -->
+                <div class="w-full h-full bg-transparent flex items-center justify-center text-white opacity-20">
+                    <svg class="w-16 h-16 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+            </div>
+            
+            <p class="text-white font-bold mt-8" id="scan-status-text">正在识别中...</p>
+        </div>
+		
+		
+		<!-- ================= 页面 17: 佣金钱包 (Commission Wallet) ================= -->
+        <div id="page-commission-wallet" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50 overflow-hidden">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">佣金钱包</h1>
+                <button onclick="togglePayoutModal()" class="text-gray-500 hover:text-blue-600 focus:outline-none p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar">
+                <!-- 收款资料未设定警示 (Warning Alert) -->
+                <div class="bg-red-50 border-b border-red-100 px-4 py-2.5 flex items-start gap-2 cursor-pointer hover:bg-red-100 transition" onclick="togglePayoutModal()">
+                    <svg class="w-4 h-4 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold text-red-700">尚未设定收款与税务资料</p>
+                        <p class="text-[10px] text-red-600 mt-0.5">请立即完善 KYC 与银行账户以激活结单及转账功能。点击前往设定 &rarr;</p>
+                    </div>
+                </div>
+
+                <!-- 资产总览 Card (更新版) -->
+                <div class="bg-white p-5 border-b border-gray-100">
+                    <div class="bg-gray-900 rounded-2xl p-5 shadow-lg relative overflow-hidden text-white">
+                        <div class="absolute -right-4 -bottom-4 opacity-10">
+                            <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path></svg>
+                        </div>
+                        <p class="text-sm text-gray-400 mb-1 font-medium">累计佣金总额 (Total Earned)</p>
+                        <div class="flex items-baseline mb-4">
+                            <span class="text-sm mr-1 text-gray-300">RM</span>
+                            <span class="text-4xl font-bold">1,880.50</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-gray-700 pt-3">
+                            <div>
+                                <p class="text-[10px] text-yellow-300 mb-0.5 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> 本月未结算 (Current Pending)</p>
+                                <p class="text-lg font-bold text-white">RM 750.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-green-300 mb-0.5 flex items-center gap-1 justify-end"><span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> 历史已汇入 (Total Realized)</p>
+                                <p class="text-lg font-bold text-white">RM 1,130.50</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签切换 (Tabs) -->
+                <div class="bg-white px-4 flex border-b border-gray-200 sticky top-0 z-10">
+                    <button id="btn-tab-history" onclick="switchWalletTab('history')" class="flex-1 py-3 text-sm font-bold text-blue-600 border-b-2 border-blue-600 transition">流水记录</button>
+                    <button id="btn-tab-settlement" onclick="switchWalletTab('settlement')" class="flex-1 py-3 text-sm font-bold text-gray-500 border-b-2 border-transparent hover:text-gray-800 transition">月度结单与税务</button>
+                </div>
+
+                <!-- 内容区 1: 流水记录 (History) -->
+                <div id="wallet-tab-history" class="p-4 space-y-3">
+                    <!-- 例 1: Blooming Bonus -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-lg">🌸</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">Blooming Bonus</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">2026-02-20 | 特别花期奖励</p>
+                            </div>
+                        </div>
+                        <span class="text-green-600 font-bold text-base">+RM 600</span>
+                    </div>
+
+                    <!-- 例 2: Commission Pool -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg">💎</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">全球奖金池分红</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">2026-02-15 | Bloomer 权益</p>
+                            </div>
+                        </div>
+                        <span class="text-green-600 font-bold text-base">+RM 150.50</span>
+                    </div>
+
+                    <!-- 例 3: 推荐 Bloomer -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-lg">👥</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">直推奖励 (Bloomer)</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">2026-02-05 | 伙伴: Michael K.</p>
+                            </div>
+                        </div>
+                        <span class="text-green-600 font-bold text-base">+RM 500</span>
+                    </div>
+
+                    <!-- 例 4: Basic Renew -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center text-lg">🔄</div>
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">直推订阅续费 (Basic)</p>
+                                <p class="text-[10px] text-gray-400 mt-0.5">2026-02-01 | 伙伴: Li Hua</p>
+                            </div>
+                        </div>
+                        <span class="text-green-600 font-bold text-base">+RM 30</span>
+                    </div>
+
+                    <p class="text-center text-xs text-gray-400 mt-6">仅显示最近 30 天记录</p>
+                </div>
+
+                <!-- 内容区 2: 月度结单与税务 (Settlements) (更新版 - 包含明细下载) -->
+                <div id="wallet-tab-settlement" class="p-4 space-y-5 hidden">
+                    
+                    <!-- 顶端：年度 CP58 (Annual Tax Form) -->
+                    <div class="bg-purple-50 rounded-xl border border-purple-100 p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-white text-purple-600 flex items-center justify-center shadow-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-purple-900">年度税务凭证 (CP58)</h3>
+                                <p class="text-[10px] text-purple-700 mt-0.5">2025 估税年度 (Year of Assessment)</p>
+                            </div>
+                        </div>
+                        <button onclick="alert('下载 2025 CP58 Form')" class="px-3 py-1.5 bg-purple-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-purple-700 transition">下载 PDF</button>
+                    </div>
+
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">月度结单明细</h3>
+
+                    <!-- 2026年 2月 (Processing) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-yellow-200 overflow-hidden">
+                        <div class="px-4 py-3 bg-yellow-50 flex justify-between items-center border-b border-yellow-100">
+                            <h3 class="text-sm font-bold text-gray-800">2026年 2月结单</h3>
+                            <span class="text-[10px] bg-yellow-200 text-yellow-800 px-2 py-1 rounded font-bold uppercase">处理中 (Processing)</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-end mb-4">
+                                <p class="text-xs text-gray-500">本月累计佣金</p>
+                                <span class="text-lg font-bold text-gray-800">RM 750.00</span>
+                            </div>
+
+                            <!-- 佣金明细 Breakdown -->
+                            <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
+                                <p class="text-xs font-bold text-gray-700 mb-2 border-b border-gray-200 pb-1">佣金来源 (Breakdown)</p>
+                                <ul class="space-y-1.5">
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>直推 Bloomer 奖励 (1人)</span><span class="font-medium">+RM 500.00</span></li>
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>直推 Basic 续费 (1人)</span><span class="font-medium">+RM 30.00</span></li>
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>奖金池分红 (Commission Pool)</span><span class="font-medium">+RM 220.00</span></li>
+                                </ul>
+                            </div>
+
+                            <p class="text-[10px] text-gray-400 bg-gray-50 p-2 rounded border border-gray-100">
+                                💡 款项将于次月 5 号前汇入您的预设银行户口。税务凭证将在入账后生成。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 2026年 1月 (Realized) -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-4 py-3 bg-gray-50 flex justify-between items-center border-b border-gray-100">
+                            <h3 class="text-sm font-bold text-gray-800">2026年 1月结单</h3>
+                            <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold uppercase">已入账 (Realized)</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-end mb-4">
+                                <p class="text-xs text-gray-500">结算金额</p>
+                                <span class="text-lg font-bold text-gray-800">RM 1,130.50</span>
+                            </div>
+
+                            <!-- 佣金明细 Breakdown -->
+                            <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100">
+                                <p class="text-xs font-bold text-gray-700 mb-2 border-b border-gray-200 pb-1">佣金来源 (Breakdown)</p>
+                                <ul class="space-y-1.5">
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>直推 Bloomer 奖励 (1人)</span><span class="font-medium">+RM 500.00</span></li>
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>直推 Basic 续费 (1人)</span><span class="font-medium">+RM 30.50</span></li>
+                                    <li class="flex justify-between text-[11px] text-gray-600"><span>特别花期奖励 (Blooming Bonus)</span><span class="font-medium">+RM 600.00</span></li>
+                                </ul>
+                            </div>
+
+                            <p class="text-[10px] text-gray-400 mb-4 flex items-center gap-1">
+                                <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                已于 2026-02-05 成功汇入 Maybank (尾号 8890)
+                            </p>
+                            
+                            <!-- 下载操作区 (E-Invoice & 报告并排) -->
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <button onclick="alert('下载 2026年1月 E-Invoice')" class="w-full flex items-center justify-center gap-1.5 py-2.5 bg-blue-50 text-blue-600 text-xs font-bold rounded-lg hover:bg-blue-100 transition border border-blue-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    E-Invoice
+                                </button>
+                                <button onclick="alert('下载 2026年1月 佣金详细流水报表 (Excel/PDF)')" class="w-full flex items-center justify-center gap-1.5 py-2.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-lg hover:bg-emerald-100 transition border border-emerald-100">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    明细报告
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+
+        <!-- ================= 全局弹窗: 收款与税务资料设定 (Payout Setup Modal) ================= -->
+        <div id="payout-setup-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[60] hidden flex-col justify-end">
+            <div class="bg-white rounded-t-3xl p-6 w-full transform transition-transform translate-y-full duration-300 h-[85vh] flex flex-col" id="payout-setup-content">
+                
+                <div class="flex justify-between items-center mb-4 shrink-0">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">收款与税务资料</h3>
+                        <p class="text-[10px] text-gray-500 mt-0.5">请准确填写以确保佣金顺利发放</p>
+                    </div>
+                    <button onclick="togglePayoutModal()" class="text-gray-400 hover:text-gray-700 bg-gray-100 rounded-full p-1.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- 身份切换 Tab -->
+                <div class="bg-gray-100 p-1 rounded-xl flex mb-5 shrink-0">
+                    <button id="tab-individual" onclick="switchPayoutType('individual')" class="flex-1 py-1.5 text-sm font-bold bg-white text-gray-800 rounded-lg shadow-sm">个人 (Individual)</button>
+                    <button id="tab-company" onclick="switchPayoutType('company')" class="flex-1 py-1.5 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-700">公司 (Company)</button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto no-scrollbar pb-4 space-y-4">
+                    
+                    <!-- 个人表单 (Individual Form) -->
+                    <div id="form-individual" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">IC 全名 (Full Name as per IC)</label>
+                            <input type="text" placeholder="例如: TAN AH MING" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">身份证号码 (IC Number)</label>
+                            <input type="text" placeholder="例如: 900101-14-5555" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">上传 IC 正面照片</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 cursor-pointer">
+                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span class="text-xs">点击上传相片</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-gray-100">
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">个人银行资料 (Bank Account)</label>
+                            <select class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-2 focus:outline-none">
+                                <option>选择银行...</option><option>Maybank</option><option>CIMB</option><option>Public Bank</option>
+                            </select>
+                            <input type="text" placeholder="银行账号 (Account Number)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+
+                    <!-- 公司表单 (Company Form) -->
+                    <div id="form-company" class="space-y-4 hidden">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">公司全名 (Company Full Name)</label>
+                            <input type="text" placeholder="例如: GPMX SDN BHD" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">注册号 (BRN)</label>
+                                <input type="text" placeholder="公司注册号" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">税号 (TIN)</label>
+                                <input type="text" placeholder="税务识别码" class="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">上传 SSM 证书</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center text-gray-500 hover:bg-gray-50 cursor-pointer">
+                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span class="text-xs">点击上传 PDF/图片</span>
+                            </div>
+                        </div>
+                        <div class="pt-2 border-t border-gray-100">
+                            <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">公司银行资料 (Corporate Bank Account)</label>
+                            <select class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm mb-2 focus:outline-none">
+                                <option>选择银行...</option><option>Maybank</option><option>CIMB</option><option>Public Bank</option>
+                            </select>
+                            <input type="text" placeholder="银行账号 (Account Number)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 shrink-0">
+                    <button onclick="alert('资料提交成功，等待后台审核！'); togglePayoutModal();" class="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl shadow-md hover:bg-blue-700 transition">
+                        保存并提交审核
+                    </button>
+                    <p class="text-center text-[9px] text-gray-400 mt-3">提交即代表您同意用于电子发票(e-Invoice)与税务呈报</p>
+                </div>
+            </div>
+        </div>
+		
+		
+		<!-- ================= 页面 18: 推荐列表 (Referee List) ================= -->
+		<div id="page-referral-list" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-gray-50 overflow-hidden">
+            <!-- 头部 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">推荐列表</h1>
+                <div class="w-8"></div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar">
+                
+                <!-- 1. Blooming Bonus 进度仪 -->
+                <div class="bg-white p-4 border-b border-gray-100 shadow-sm mb-2">
+                    <div class="bg-gradient-to-br from-purple-600 to-pink-500 rounded-2xl p-4 text-white shadow-md relative overflow-hidden">
+                        <!-- 背景装饰 -->
+                        <div class="absolute -right-4 -bottom-4 opacity-20 text-7xl">🌸</div>
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-sm font-bold flex items-center gap-1 shadow-sm">Blooming Bonus</h3>
+                                    <p class="text-[10px] text-purple-100 mt-0.5">每邀请 6 位 Bloomer 激活，即获 RM 600 奖励</p>
+                                </div>
+                                <span class="text-[10px] bg-white bg-opacity-20 backdrop-blur-sm px-2 py-1 rounded font-bold shadow-sm">进度: 4/6</span>
+                            </div>
+                            
+                            <!-- 花朵进度可视化 -->
+                            <div class="flex justify-between mt-4">
+                                <!-- 已点亮的花朵 -->
+                                <div class="w-9 h-9 rounded-full bg-white text-purple-600 flex items-center justify-center text-lg shadow-md transform hover:scale-110 transition">🌸</div>
+                                <div class="w-9 h-9 rounded-full bg-white text-purple-600 flex items-center justify-center text-lg shadow-md transform hover:scale-110 transition">🌸</div>
+                                <div class="w-9 h-9 rounded-full bg-white text-purple-600 flex items-center justify-center text-lg shadow-md transform hover:scale-110 transition">🌸</div>
+                                <div class="w-9 h-9 rounded-full bg-white text-purple-600 flex items-center justify-center text-lg shadow-md transform hover:scale-110 transition">🌸</div>
+                                <!-- 未点亮的花朵 -->
+                                <div class="w-9 h-9 rounded-full bg-black bg-opacity-20 flex items-center justify-center text-lg border border-purple-300 border-opacity-50">🌸</div>
+                                <div class="w-9 h-9 rounded-full bg-black bg-opacity-20 flex items-center justify-center text-lg border border-purple-300 border-opacity-50">🌸</div>
+                            </div>
+                            <p class="text-[9px] text-purple-100 mt-3 text-center opacity-80">保持活跃身份，累计无时间限制</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 数据统计与筛选 Tab -->
+                <div class="bg-white sticky top-0 z-10 border-b border-gray-100 shadow-sm">
+                    <div class="flex p-4 gap-6">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">累计推荐</p>
+                            <p class="text-xl font-bold text-gray-800">12 <span class="text-xs font-normal text-gray-500">人</span></p>
+                        </div>
+                        <div class="w-px bg-gray-200"></div>
+                        <div>
+                            <p class="text-[10px] text-purple-500 uppercase tracking-wider mb-0.5">活跃 Bloomer</p>
+                            <p class="text-xl font-bold text-purple-600">4 <span class="text-xs font-normal text-purple-400">人</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex px-4 pb-3 gap-2 overflow-x-auto no-scrollbar">
+                        <button class="px-4 py-1.5 bg-gray-900 text-white text-xs font-bold rounded-full shrink-0 shadow-sm">全部 (All)</button>
+                        <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">Bloomer</button>
+                        <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">Basic</button>
+                        <!-- 这里的过滤标签修改为 “非订阅” 以包容 Free Trial 和 Expired -->
+                        <button class="px-4 py-1.5 bg-white border border-gray-200 text-gray-600 hover:text-blue-600 text-xs font-medium rounded-full shrink-0">非订阅 (Non-sub)</button>
+                    </div>
+                </div>
+
+                <!-- 3. 用户卡片列表 -->
+                <div class="p-4 space-y-4">
+                    
+                    <!-- 卡片 A: Bloomer 用户 -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500 text-yellow-900 font-bold flex items-center justify-center text-lg shadow-sm">M</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1">Michael K.</h4>
+                                    <span class="bg-yellow-100 text-yellow-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border border-yellow-200">Bloomer</span>
+                                </div>
+                            </div>
+                            <!-- WhatsApp 快捷联系 -->
+                            <button onclick="alert('即将打开 WhatsApp 联络 Michael K.')" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition shadow-sm border border-green-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.474-1.46-1.647-1.758-.173-.298-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">联系方式</p>
+                                <p class="text-xs font-medium text-gray-700">+60 12-345 ****</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">最后登入</p>
+                                <p class="text-xs font-medium text-gray-700">2026-02-21 (今天)</p>
+                            </div>
+                            <div class="col-span-2 mt-1 pt-2 border-t border-gray-200">
+                                <p class="text-[9px] text-gray-400 mb-0.5">账号状态</p>
+                                <p class="text-xs font-bold text-green-600 flex items-center gap-1.5">
+                                    2027-01-15 到期 
+                                    <span class="text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        自动续费 (Auto-renew)
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片 B: Basic 用户 (需手动续费) -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-lg shadow-sm">L</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1">Li Hua</h4>
+                                    <span class="bg-blue-100 text-blue-800 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border border-blue-200">Basic</span>
+                                </div>
+                            </div>
+                            <button onclick="alert('即将打开 WhatsApp 联络 Li Hua')" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition shadow-sm border border-green-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.474-1.46-1.647-1.758-.173-.298-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">联系方式</p>
+                                <p class="text-xs font-medium text-gray-700">+60 17-888 ****</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">最后登入</p>
+                                <p class="text-xs font-medium text-gray-700">2天前</p>
+                            </div>
+                            <!-- 账号状态带有行动呼吁 (CTA) -->
+                            <div class="col-span-2 mt-1 pt-2 border-t border-gray-200 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] text-gray-400 mb-0.5">账号状态</p>
+                                    <p class="text-xs font-bold text-orange-500 flex items-center gap-1.5">
+                                        2026-03-20 到期 
+                                        <span class="text-[9px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">需手动续费 (Manual)</span>
+                                    </p>
+                                </div>
+                                <button onclick="alert('发送续费提醒')" class="text-[10px] bg-orange-500 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm hover:bg-orange-600 transition">提醒续费</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 卡片 C: Free Trial 用户 (从未订阅过) -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-600 font-bold flex items-center justify-center text-lg shadow-sm">W</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1">Wei Wei</h4>
+                                    <span class="bg-gray-100 text-gray-600 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border border-gray-200">Free Trial</span>
+                                </div>
+                            </div>
+                            <button onclick="alert('即将打开 WhatsApp 联络 Wei Wei')" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition shadow-sm border border-green-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.474-1.46-1.647-1.758-.173-.298-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">联系方式</p>
+                                <p class="text-xs font-medium text-gray-700">+60 19-222 ****</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">最后登入</p>
+                                <p class="text-xs font-medium text-gray-700">2026-01-20</p>
+                            </div>
+                            <!-- 账号状态带有行动呼吁 (CTA) -->
+                            <div class="col-span-2 mt-1 pt-2 border-t border-gray-200 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] text-gray-400 mb-0.5">账号状态</p>
+                                    <p class="text-xs font-bold text-gray-500 flex items-center gap-1.5">
+                                        永久体验账户 
+                                        <!-- ⭐ 强调该用户从未付费订阅过 -->
+                                        <span class="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded border border-gray-300">从未订阅 (Never Subscribed)</span>
+                                    </p>
+                                </div>
+                                <button onclick="alert('发送邀请升级资讯')" class="text-[10px] bg-blue-600 text-white font-bold px-3 py-1.5 rounded-lg shadow-sm hover:bg-blue-700 transition">邀请升级</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ⭐ 卡片 D: 已断订用户 (Expired / Churned User) -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-3 relative hover:shadow-md transition opacity-[0.92]">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-500 font-bold flex items-center justify-center text-lg shadow-sm">S</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-gray-800 flex items-center gap-1">Sarah Lee</h4>
+                                    <!-- 红色 Expired 标签 -->
+                                    <span class="bg-red-50 text-red-600 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider border border-red-100">Expired</span>
+                                </div>
+                            </div>
+                            <button onclick="alert('即将打开 WhatsApp 联络 Sarah Lee')" class="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition shadow-sm border border-green-100">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.305-.88-.653-1.474-1.46-1.647-1.758-.173-.298-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">联系方式</p>
+                                <p class="text-xs font-medium text-gray-700">+60 11-555 ****</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-400 mb-0.5">最后登入</p>
+                                <p class="text-xs font-medium text-gray-700">1个月前</p>
+                            </div>
+                            <!-- 账号状态：清楚列明断订日期与曾用等级 -->
+                            <div class="col-span-2 mt-1 pt-2 border-t border-gray-200 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[9px] text-gray-400 mb-0.5">账号状态</p>
+                                    <p class="text-xs font-bold text-red-500 flex items-center gap-1.5">
+                                        已断订 (2025-11-30) 
+                                        <span class="text-[9px] bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100">曾是 Basic 用户</span>
+                                    </p>
+                                </div>
+                                <button onclick="alert('发送专属挽回优惠 (Win-back Offer) 给 Sarah Lee')" class="text-[10px] bg-red-50 text-red-600 border border-red-200 font-bold px-3 py-1.5 rounded-lg shadow-sm hover:bg-red-100 transition">挽回优惠</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-[10px] text-gray-400 pt-4">已经到底啦</p>
+                </div>
+            </main>
+        </div>
+		
+
+		<!-- ================= 页面 19: 任务中心 (Quests Centre) ================= -->
+        <div id="page-quests-centre" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-30 bg-gray-50 overflow-hidden">
+            <!-- 头部导航 -->
+            <header class="bg-white px-4 py-3 flex justify-between items-center sticky top-0 z-20 shadow-sm shrink-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h1 class="text-lg font-bold text-gray-800 tracking-wider">任务中心</h1>
+                <!-- 积分展示 -->
+                <button onclick="navigateTo('page-profile')" class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-md border border-purple-100 flex items-center gap-1">
+                    🌸 1,880
+                </button>
+            </header>
+
+            <main class="flex-1 overflow-y-auto pb-12 no-scrollbar bg-gray-100">
+                
+                <!-- 1. 当前等级与进度 (Level Banner) -->
+                <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-black p-6 text-white shadow-md relative overflow-hidden shrink-0">
+                    <div class="absolute -right-4 -top-4 opacity-20 text-8xl">👑</div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-yellow-400 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Bloomer 专属</span>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-1 tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-500">LEVEL 3</h2>
+                        <p class="text-xs text-indigo-200 mb-5">灵性觉醒者 · 稳定同频中</p>
+                        
+                        <!-- 50/50 进度条 -->
+                        <div class="flex justify-between items-end mb-1.5">
+                            <span class="text-[10px] text-gray-300 uppercase tracking-widest">当前等级任务池进度</span>
+                            <span class="text-sm font-bold text-yellow-400">25 / 50</span>
+                        </div>
+                        <div class="w-full bg-white bg-opacity-20 rounded-full h-2 shadow-inner">
+                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.5)]" style="width: 50%"></div>
+                        </div>
+                        <p class="text-[9px] text-indigo-300 mt-2 text-right">完成 50 个悬赏并达成通关试炼即可晋升 LEVEL 4</p>
+                    </div>
+                </div>
+
+                <div class="p-4 space-y-5">
+
+                    <!-- 2. 核心通关任务 (Advancement Quest) - 置顶显示 -->
+                    <section>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="text-base leading-none">🔑</span> 升阶通关试炼
+                            </h3>
+                            <span class="text-[9px] text-gray-400">可提前完成</span>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-4 shadow-[0_4px_15px_rgba(0,0,0,0.05)] border border-yellow-200 relative overflow-hidden group">
+                            <!-- 动态扫光效果 -->
+                            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-50 transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                            
+                            <div class="flex items-start gap-3 relative z-10">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center text-xl shrink-0 shadow-inner">🌟</div>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-800 mb-0.5">解锁一次 Blooming Bonus</h4>
+                                    <p class="text-[10px] text-gray-500 leading-relaxed mb-3">邀请 6 位好友购买 Bloomer 激活包。这是晋升至 Level 4 的必备条件。</p>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <!-- 内部小进度 -->
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-[10px] font-bold text-orange-500 bg-orange-50 px-2 py-0.5 rounded">进度 4/6</span>
+                                        </div>
+                                        <button onclick="navigateTo('page-referral-list')" class="text-xs bg-gray-900 text-white font-bold px-4 py-1.5 rounded-lg shadow-md hover:bg-black transition">去邀请</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 3. 专属悬赏池 (Level Quest Pool) -->
+                    <section>
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest flex items-center gap-1.5">
+                                <span class="text-base leading-none">🎯</span> 今日等级悬赏
+                            </h3>
+                            <!-- 刷新按钮 (耗费 Sun Token) -->
+                            <button onclick="alert('消耗 1 ☀️ 刷新当前任务？')" class="text-[10px] text-blue-600 bg-blue-50 px-2 py-1 rounded-md flex items-center gap-1 hover:bg-blue-100 transition">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> 刷新
+                            </button>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="bg-purple-100 text-purple-700 text-[9px] font-bold px-2 py-0.5 rounded uppercase">Level 3 悬赏 (26/50)</span>
+                                <span class="text-[11px] font-bold text-purple-600 flex items-center gap-0.5"><span class="text-xs">🌸</span> +50 分</span>
+                            </div>
+                            <h4 class="text-base font-bold text-gray-800 mb-1">完成一篇显化法则阅读</h4>
+                            <p class="text-xs text-gray-500 mb-4">前往 Learning Hub 阅读并完成《显化法则 101》思维导图的翻阅。</p>
+                            <button onclick="navigateTo('page-learning-pdf')" class="w-full py-2.5 bg-purple-600 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-purple-700 transition">立即前往完成</button>
+                        </div>
+                    </section>
+
+                    <!-- 4. 每日必修 (Daily Recurring) -->
+                    <section>
+                        <h3 class="text-xs font-bold text-gray-800 uppercase tracking-widest flex items-center gap-1.5 mb-3">
+                            <span class="text-base leading-none">🔁</span> 每日能量打卡
+                        </h3>
+                        
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50">
+                            
+                            <!-- 固定 1: 每日高维指引 (已完成状态示范) -->
+                            <div class="p-4 flex items-center justify-between opacity-60 bg-gray-50">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-800 line-through">抽取高维指引金句</h4>
+                                        <p class="text-[10px] text-gray-400 mt-0.5">连续打卡: 5 天</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-gray-400">+10 分 (已领)</span>
+                            </div>
+
+                            <!-- 固定 2: 每日静坐冥想 -->
+                            <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer" onclick="navigateTo('page-meditation')">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 text-sm">🧘</div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-800">完成一次静坐冥想</h4>
+                                        <p class="text-[10px] text-gray-500 mt-0.5">最低要求 5 分钟，当前进度 0/5</p>
+                                    </div>
+                                </div>
+                                <button class="text-xs text-indigo-600 font-bold bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100">去调频</button>
+                            </div>
+
+                            <!-- 固定 3: AI 对话 -->
+                            <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition cursor-pointer" onclick="navigateTo('page-ai-selection')">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 text-sm">🤖</div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-gray-800">与高我深度对话</h4>
+                                        <p class="text-[10px] text-gray-500 mt-0.5">消耗至少 1 次 Sun Token 进行连结</p>
+                                    </div>
+                                </div>
+                                <button class="text-xs text-blue-600 font-bold bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">去连结</button>
+                            </div>
+
+                            <!-- 随机 1: 线下验证类任务 (带 Self-reporting 机制) -->
+                            <div class="p-4 flex items-center justify-between hover:bg-gray-50 transition">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center shrink-0 text-sm">💬</div>
+                                    <div class="flex-1 pr-2">
+                                        <div class="flex gap-2 items-center">
+                                            <span class="text-[8px] bg-gray-800 text-white px-1.5 py-0.5 rounded uppercase">随机</span>
+                                            <h4 class="text-sm font-bold text-gray-800 leading-tight">向身边亲友表达感谢</h4>
+                                        </div>
+                                        <p class="text-[10px] text-gray-500 mt-1 leading-tight">今天对一个人说出具体的感谢之词。</p>
+                                    </div>
+                                </div>
+                                <!-- 点击弹窗输入反思 -->
+                                <button onclick="alert('弹出日志框：\n请简述您今天向谁表达了感谢？\n\n[输入框]\n\n[提交并领取 +10分]')" class="text-xs text-gray-600 font-bold bg-white border border-gray-300 px-3 py-1.5 rounded-lg shadow-sm hover:bg-gray-50">已完成</button>
+                            </div>
+
+                        </div>
+                    </section>
+                    
+                    <div class="h-6"></div> <!-- 留白 -->
+                </div>
+            </main>
+        </div>
+		
+
+        <!-- ================= 最后页面 : 占位页面 (通用开发中) ================= -->
+        <div id="page-placeholder" class="app-page hidden flex flex-col h-full w-full absolute inset-0 z-40 bg-gray-50">
+            <header class="bg-white shadow-sm px-4 py-3 flex items-center sticky top-0">
+                <button onclick="navigateTo('page-dashboard')" class="p-2 -ml-2 text-gray-600 hover:text-gray-900 focus:outline-none flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg><span>返回首页</span>
+                </button>
+                <h1 id="placeholder-title" class="text-lg font-bold text-gray-800 ml-4">页面名称</h1>
+            </header>
+            <div class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-gray-50">
+                <div class="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mb-4"><svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg></div>
+                <h2 id="placeholder-name" class="text-xl font-bold text-gray-800 mb-2">正在开发中</h2>
+                <p class="text-gray-500 text-sm">此为占位页面。<br>准备开发: <strong id="placeholder-target" class="text-blue-600">xxx</strong></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 交互逻辑脚本 -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        function toggleSidebar() {
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+        function navigateTo(targetPageId) {
+            if (!sidebar.classList.contains('-translate-x-full')) toggleSidebar();
+            const allPages = document.querySelectorAll('.app-page');
+            allPages.forEach(page => {
+                if (page.id === targetPageId) {
+                    page.classList.remove('hidden');
+                    const mainArea = page.querySelector('main');
+                    if(mainArea) mainArea.scrollTop = 0;
+                } else {
+                    page.classList.add('hidden');
+                }
+            });
+        }
+        function navigatePlaceholder(pageName) {
+            document.getElementById('placeholder-title').innerText = pageName;
+            document.getElementById('placeholder-name').innerText = pageName;
+            document.getElementById('placeholder-target').innerText = pageName;
+            navigateTo('page-placeholder');
+        }
+		function toggleChatHistory() {
+			const drawer = document.getElementById('history-drawer');
+			const overlay = document.getElementById('history-overlay');
+			if (drawer.classList.contains('translate-x-full')) {
+				// 打开
+				drawer.classList.remove('translate-x-full');
+				overlay.classList.remove('hidden');
+			} else {
+				// 关闭
+				drawer.classList.add('translate-x-full');
+				overlay.classList.add('hidden');
+			}
+		}
+		// ====== 扫码签到交互逻辑 ======
+        let scanTimer;
+        function openQRScanner() {
+            const modal = document.getElementById('qr-modal');
+            const statusText = document.getElementById('scan-status-text');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            statusText.innerText = "正在寻找二维码...";
+            statusText.classList.remove('text-green-400');
+            statusText.classList.add('text-white');
+
+            // 模拟扫描 2.5 秒后成功
+            scanTimer = setTimeout(() => {
+                statusText.innerText = "签到成功！";
+                statusText.classList.remove('text-white');
+                statusText.classList.add('text-green-400');
+                
+                // 成功后延迟 1 秒关闭并提示
+                setTimeout(() => {
+                    closeQRScanner();
+                    alert("🎉 恭喜！线下活动签到成功。\n\n奖励已发放：\n🌸 +200 绽放分数\n🏅 获得限定勋章：线下先行者");
+                }, 1000);
+            }, 2500);
+        }
+
+        function closeQRScanner() {
+            clearTimeout(scanTimer);
+            const modal = document.getElementById('qr-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+		
+		// ====== 佣金钱包 (Commission Wallet) 交互逻辑 ======
+        function switchWalletTab(tabId) {
+            // 隐藏所有内容
+            document.getElementById('wallet-tab-history').classList.add('hidden');
+            document.getElementById('wallet-tab-settlement').classList.add('hidden');
+            
+            // 重置所有按钮样式
+            document.getElementById('btn-tab-history').classList.remove('text-blue-600', 'border-blue-600');
+            document.getElementById('btn-tab-history').classList.add('text-gray-500', 'border-transparent');
+            document.getElementById('btn-tab-settlement').classList.remove('text-blue-600', 'border-blue-600');
+            document.getElementById('btn-tab-settlement').classList.add('text-gray-500', 'border-transparent');
+            
+            // 显示目标内容与高亮按钮
+            document.getElementById('wallet-tab-' + tabId).classList.remove('hidden');
+            const targetBtn = document.getElementById('btn-tab-' + tabId);
+            targetBtn.classList.remove('text-gray-500', 'border-transparent');
+            targetBtn.classList.add('text-blue-600', 'border-blue-600');
+        }
+
+        function togglePayoutModal() {
+            const modal = document.getElementById('payout-setup-modal');
+            const modalContent = document.getElementById('payout-setup-content');
+            
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modalContent.classList.remove('translate-y-full'), 10);
+            } else {
+                modalContent.classList.add('translate-y-full');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            }
+        }
+
+        function switchPayoutType(type) {
+            // Reset tab styles
+            document.getElementById('tab-individual').className = 'flex-1 py-1.5 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-700';
+            document.getElementById('tab-company').className = 'flex-1 py-1.5 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-700';
+            
+            // Highlight selected tab
+            document.getElementById('tab-' + type).className = 'flex-1 py-1.5 text-sm font-bold bg-white text-gray-800 rounded-lg shadow-sm';
+            
+            // Toggle forms
+            if(type === 'individual') {
+                document.getElementById('form-individual').classList.remove('hidden');
+                document.getElementById('form-company').classList.add('hidden');
+            } else {
+                document.getElementById('form-individual').classList.add('hidden');
+                document.getElementById('form-company').classList.remove('hidden');
+            }
+        }
+		
+    </script>
+</body>
+</html>
